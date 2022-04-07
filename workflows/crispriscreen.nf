@@ -16,6 +16,7 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 
 // Check mandatory parameters
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
+if (params.fasta) { ch_fasta = file(params.fasta) } else { exit 1, 'Input fasta file for sgRNA library not specified!' }
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -48,6 +49,7 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 //
 include { FASTQC                      } from '../modules/nf-core/modules/fastqc/main'
 include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
+include { BOWTIE2_BUILD               } from '../modules/nf-core/modules/bowtie2/build/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
 
 /*
@@ -78,6 +80,15 @@ workflow CRISPRISCREEN {
         INPUT_CHECK.out.reads
     )
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
+    
+    //
+    // MODULE: Bowtie2  - build genome database index from fasta input
+    //
+    BOWTIE2_BUILD (
+        ch_fasta
+    )
+    ch_versions = ch_versions.mix(BOWTIE2_BUILD.out.versions)
+    
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
