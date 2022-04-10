@@ -9,3 +9,4 @@ testing*
 *.Rproj.user
 *.Rproj
 test/*
+.Rproj.user
