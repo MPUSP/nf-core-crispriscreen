@@ -38,6 +38,11 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
 
+//
+// MODULE: Local non nf-core modules
+//
+include { PREPARE_LIBRARY } from '../modules/local/prepare_library'
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     IMPORT NF-CORE MODULES/SUBWORKFLOWS
@@ -51,6 +56,7 @@ include { FASTQC                      } from '../modules/nf-core/modules/fastqc/
 include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
 include { BOWTIE2_BUILD               } from '../modules/nf-core/modules/bowtie2/build/main'
 include { BOWTIE2_ALIGN               } from '../modules/nf-core/modules/bowtie2/align/main'
+include { SUBREAD_FEATURECOUNTS       } from '../modules/nf-core/modules/subread/featurecounts/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
 
 /*
@@ -73,6 +79,14 @@ workflow CRISPRISCREEN {
         ch_input
     )
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
+    
+    //
+    // MODULE: Convert *.fasta input file to pseudo genome database (*.saf)
+    //
+    PREPARE_LIBRARY (
+        ch_fasta
+    )
+    ch_versions = ch_versions.mix(PREPARE_LIBRARY.out.versions)
 
     //
     // MODULE: Run FastQC
@@ -98,6 +112,23 @@ workflow CRISPRISCREEN {
     )
     ch_versions = ch_versions.mix(BOWTIE2_ALIGN.out.versions)
     
+    //
+    // MODULE: Subread/featureCounts - generates statistics about read counts per gene
+    //
+    ch_featurecounts = Channel.empty()
+    ch_featurecounts = BOWTIE2_ALIGN.out.bam
+    ch_featurecounts
+        .combine(PREPARE_LIBRARY.out.annotation)
+        .set { ch_featurecounts }
+
+    SUBREAD_FEATURECOUNTS (
+        ch_featurecounts
+    )
+    ch_versions = ch_versions.mix(SUBREAD_FEATURECOUNTS.out.versions.first())
+    
+    //
+    // MODULE: Dump Software Versions
+    //
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
