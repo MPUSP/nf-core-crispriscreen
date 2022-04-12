@@ -1,9 +1,11 @@
 # ![nf-core/crispriscreen](docs/images/nf-core-crispriscreen_logo_light.png#gh-light-mode-only) ![nf-core/crispriscreen](docs/images/nf-core-crispriscreen_logo_dark.png#gh-dark-mode-only)
 
+<!--
 [![GitHub Actions CI Status](https://github.com/nf-core/crispriscreen/workflows/nf-core%20CI/badge.svg)](https://github.com/nf-core/crispriscreen/actions?query=workflow%3A%22nf-core+CI%22)
 [![GitHub Actions Linting Status](https://github.com/nf-core/crispriscreen/workflows/nf-core%20linting/badge.svg)](https://github.com/nf-core/crispriscreen/actions?query=workflow%3A%22nf-core+linting%22)
 [![AWS CI](https://img.shields.io/badge/CI%20tests-full%20size-FF9900?labelColor=000000&logo=Amazon%20AWS)](https://nf-co.re/crispriscreen/results)
 [![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.XXXXXXX-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.XXXXXXX)
+-->
 
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A521.10.3-23aa62.svg?labelColor=000000)](https://www.nextflow.io/)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
@@ -16,22 +18,25 @@
 
 ## Introduction
 
-<!-- TODO nf-core: Write a 1-2 sentence summary of what data the pipeline is for and what it does -->
-
 **nf-core/crispriscreen** is a bioinformatics best-practice analysis pipeline to process next generation sequencing data obtained from CRISPRi repression library screenings.
 
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It uses Docker/Singularity containers making installation trivial and results highly reproducible. The [Nextflow DSL2](https://www.nextflow.io/docs/latest/dsl2.html) implementation of this pipeline uses one container per process which makes it much easier to maintain and update software dependencies. Where possible, these processes have been submitted to and installed from [nf-core/modules](https://github.com/nf-core/modules) in order to make them available to all nf-core pipelines, and to everyone within the Nextflow community!
 
-<!-- TODO nf-core: Add full-sized test dataset and amend the paragraph below if applicable -->
-
+<!-- TODO nf-core: Add full-sized test dataset and amend the paragraph below if applicable
 On release, automated continuous integration tests run the pipeline on a full-sized dataset on the AWS cloud infrastructure. This ensures that the pipeline runs on AWS, has sensible resource allocation defaults set to run on real-world datasets, and permits the persistent storage of results to benchmark between pipeline releases and other analysis sources. The results obtained from the full-sized test can be viewed on the [nf-core website](https://nf-co.re/crispriscreen/results).
+ -->
 
 ## Pipeline summary
 
-<!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->
-
 1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
-2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
+2. Adapter and quality trimming ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
+3. Preparation of `*.fasta` library (custom [R script](https://cran.r-project.org/))
+4. Alignment using ([`Bowtie2`](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml))
+    1. Build index from `*.fasta` library
+    2. Align reads to library
+5. Count reads per target and input file ([`subread/featurecounts`](https://nf-co.re/modules/subread_featurecounts))
+6. Quantify gene fitness score from multiple targets per gene, report statistics ([DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html))
+7. Present QC for raw and mapped reads ([`MultiQC`](http://multiqc.info/))
 
 ## Quick Start
 
@@ -54,23 +59,19 @@ On release, automated continuous integration tests run the pipeline on a full-si
 
 4. Start running your own analysis!
 
-   <!-- TODO nf-core: Update the example "typical command" below used to run the pipeline -->
-
    ```console
-   nextflow run nf-core/crispriscreen --input samplesheet.csv --outdir <OUTDIR> --genome GRCh37 -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
+   nextflow run nf-core-crispriscreen -profile <docker/singularity/podman/shifter/charliecloud/conda/institute> --input "test/fastq/samplesheet.csv" --fasta "test/ref/library.fasta" --outdir <OUTDIR>
    ```
 
 ## Documentation
 
-The nf-core/crispriscreen pipeline comes with documentation about the pipeline [usage](https://nf-co.re/crispriscreen/usage), [parameters](https://nf-co.re/crispriscreen/parameters) and [output](https://nf-co.re/crispriscreen/output).
+<!-- TODO: Add links to main nf-core website if published, e.g. [usage](https://nf-co.re/crispriscreen/usage) -->
+
+The nf-core/crispriscreen pipeline comes with documentation about the pipeline [usage](https://m-jahn.github.io/nf-core-crispriscreen/usage.md) and [output](https://m-jahn.github.io/nf-core-crispriscreen/output.md).
 
 ## Credits
 
 nf-core/crispriscreen was originally written by Michael Jahn.
-
-We thank the following people for their extensive assistance in the development of this pipeline:
-
-<!-- TODO nf-core: If applicable, make list of people who have also contributed -->
 
 ## Contributions and Support
 
