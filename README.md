@@ -67,7 +67,7 @@ On release, automated continuous integration tests run the pipeline on a full-si
 
 <!-- TODO: Add links to main nf-core website if published, e.g. [usage](https://nf-co.re/crispriscreen/usage) -->
 
-The nf-core/crispriscreen pipeline comes with documentation about the pipeline [usage](https://m-jahn.github.io/nf-core-crispriscreen/usage.md) and [output](https://m-jahn.github.io/nf-core-crispriscreen/output.md).
+The nf-core/crispriscreen pipeline comes with documentation about the pipeline [usage](https://m-jahn.github.io/nf-core-crispriscreen/usage) and [output](https://m-jahn.github.io/nf-core-crispriscreen/output).
 
 ## Credits
 

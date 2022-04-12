@@ -14,7 +14,7 @@ The pipeline processes (Illumina) next generation sequencing data obtained from 
 - The `samplesheet.csv` describing samples. See following section for details.
 - A reference 'library' in `*.fasta` format
 
-The results of running the pipeline are described in detail at [Output](output.md).
+The results of running the pipeline are described in detail at [output](output.md).
 
 ## Samplesheet input
 

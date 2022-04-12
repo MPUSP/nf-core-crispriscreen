@@ -18,8 +18,8 @@ fasta_file <- args[1]
 # read and process fasta file
 fasta_df <- read.delim(fasta_file, header = FALSE)
 saf_df <- data.frame(
-  GeneID = fasta_df[seq(1, nrow(fasta_df), 2), 1],
-  Sequence = fasta_df[seq(2, nrow(fasta_df), 2), 1]
+    GeneID = fasta_df[seq(1, nrow(fasta_df), 2), 1],
+    Sequence = fasta_df[seq(2, nrow(fasta_df), 2), 1]
 )
 
 # check for duplications
@@ -36,4 +36,4 @@ saf_df <- saf_df[c("GeneID", "Chr", "Start", "End", "Strand", "Sequence")]
 
 saf_name <- gsub("fasta$", "saf", basename(fasta_file))
 write.table(x = saf_df, file = saf_name, sep = "\t", row.names = FALSE,
-  col.names = FALSE, quote = FALSE)
+    col.names = FALSE, quote = FALSE)

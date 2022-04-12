@@ -1,4 +1,4 @@
-sample,fastq_1,fastq_2,replicate,date,time,group,reference_group
-example_T1,./test/fastq/Example_S1_R1.fastq.gz,,1,2021_01_09,0,1,1
-example_T2,./test/fastq/Example_S1_R2.fastq.gz,,2,2021_01_09,0,1,1
-example_T3,./test/fastq/Example_S1_R3.fastq.gz,,3,2021_01_09,0,1,1
+sample,fastq_1,fastq_2,condition,replicate,date,time,group,reference_group
+Example_S1_R1,./test/fastq/Example_S1_R1.fastq.gz,,example,1,2021_01_09,0,1,1
+Example_S1_R2,./test/fastq/Example_S1_R2.fastq.gz,,example,2,2021_01_09,0,1,1
+Example_S1_R3,./test/fastq/Example_S1_R3.fastq.gz,,example,3,2021_01_09,0,1,1
