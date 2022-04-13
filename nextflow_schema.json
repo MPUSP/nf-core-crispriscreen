@@ -226,9 +226,30 @@
                     "fa_icon": "fas fa-cogs",
                     "hidden": true
                 },
+                "subsampling": {
+                    "type": "boolean",
+                    "description": "Whether to subsample input reads.",
+                    "default": false,
+                    "fa_icon": "fas fa-check-square",
+                    "hidden": true
+                },
+                "sample_size": {
+                    "type": "integer",
+                    "description": "Number of reads that are sampled per input file if subsampling is true",
+                    "default": 10000,
+                    "fa_icon": "fas fa-check-square",
+                    "hidden": true
+                },
+                "fixed_seed": {
+                    "type": "boolean",
+                    "description": "Whether the same reads (by position) should be sampled from input files. Can be useful for paired end reads.",
+                    "default": false,
+                    "fa_icon": "fas fa-check-square",
+                    "hidden": true
+                },
                 "save_unaligned": {
                     "type": "boolean",
-                    "description": "Boolean whether to export unaligned reads from bowtie2 output or not",
+                    "description": "Whether to export unaligned reads from bowtie2 output or not",
                     "default": false,
                     "fa_icon": "fas fa-check-square",
                     "hidden": true
