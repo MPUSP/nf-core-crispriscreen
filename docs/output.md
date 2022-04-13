@@ -16,8 +16,8 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 2. Adapter and quality trimming ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
 3. Preparation of `*.fasta` library (custom [R script](https://cran.r-project.org/))
 4. Alignment using ([`Bowtie2`](http://multiqc.info/))
-    1. Build index from `*.fasta` library
-    2. Align reads to library
+   1. Build index from `*.fasta` library
+   2. Align reads to library
 5. Count reads per target and input file ([`subread/featurecounts`](https://nf-co.re/modules/subread_featurecounts))
 6. Quantify gene fitness score from mulitple targets per gene, report statistics ([DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html))
 7. Present QC for raw and mapped reads ([`MultiQC`](http://multiqc.info/))
@@ -80,11 +80,10 @@ This is the input for fitness score calculation with DESeq2.
 
 - `To be added`
   - `To be added`: To be added.
-  
+
 </details>
 
-A custom R script employing [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html) to quantify gene fitness score from multiple targets per gene, and reports statistics.  
-
+A custom R script employing [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html) to quantify gene fitness score from multiple targets per gene, and reports statistics.
 
 ### MultiQC
 

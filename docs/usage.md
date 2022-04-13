@@ -1,6 +1,6 @@
 # nf-core/crispriscreen: Usage
 
-<!-- 
+<!--
 ## :warning: Please read this documentation on the nf-core website: [https://nf-co.re/crispriscreen/usage](https://nf-co.re/crispriscreen/usage)
 
 > _Documentation of pipeline parameters is generated automatically from the pipeline schema and can no longer be found in markdown files._
@@ -51,17 +51,17 @@ Example_S2_R2,./test/fastq/Example_S2_R2.fastq.gz,,example,2,2021_01_09,4,2,1
 Example_S2_R3,./test/fastq/Example_S2_R3.fastq.gz,,example,3,2021_01_09,4,2,1
 ```
 
-| Column    | Description                                                                                                                                                                            |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sample`  | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. |
-| `fastq_1` | Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz". |
-| `fastq_2` | Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz". |
-| `condition` | Name of the treatment or condition. |
-| `replicate`  | Index of the replicate. |
-| `date`       | Sampling date. |
-| `time`       | Generation time or a similar metric after which library composition is sampled. Note: not meant to be a time stamp, but a duration! |
-| `group`      | Number indicating all replicates of one treatment/time combination that belong together. |
-| `reference_group` | Number indicating the group that these samples will be compared to. For zero time points, can be the same as `group`. |
+| Column            | Description                                                                                                                         |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `sample`          | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample.                       |
+| `fastq_1`         | Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".          |
+| `fastq_2`         | Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".          |
+| `condition`       | Name of the treatment or condition.                                                                                                 |
+| `replicate`       | Index of the replicate.                                                                                                             |
+| `date`            | Sampling date.                                                                                                                      |
+| `time`            | Generation time or a similar metric after which library composition is sampled. Note: not meant to be a time stamp, but a duration! |
+| `group`           | Number indicating all replicates of one treatment/time combination that belong together.                                            |
+| `reference_group` | Number indicating the group that these samples will be compared to. For zero time points, can be the same as `group`.               |
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
 
