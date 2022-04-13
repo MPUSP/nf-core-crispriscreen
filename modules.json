@@ -1,26 +1,29 @@
 {
-  "name": "nf-core/crispriscreen",
-  "homePage": "https://github.com/nf-core/crispriscreen",
-  "repos": {
-    "nf-core/modules": {
-      "bowtie2/align": {
-        "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
-      },
-      "bowtie2/build": {
-        "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
-      },
-      "custom/dumpsoftwareversions": {
-        "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
-      },
-      "fastqc": {
-        "git_sha": "49b18b1639f4f7104187058866a8fab33332bdfe"
-      },
-      "multiqc": {
-        "git_sha": "49b18b1639f4f7104187058866a8fab33332bdfe"
-      },
-      "subread/featurecounts": {
-        "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
-      }
+    "name": "nf-core/crispriscreen",
+    "homePage": "https://github.com/nf-core/crispriscreen",
+    "repos": {
+        "nf-core/modules": {
+            "bowtie2/align": {
+                "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
+            },
+            "bowtie2/build": {
+                "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
+            },
+            "custom/dumpsoftwareversions": {
+                "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
+            },
+            "fastqc": {
+                "git_sha": "49b18b1639f4f7104187058866a8fab33332bdfe"
+            },
+            "multiqc": {
+                "git_sha": "49b18b1639f4f7104187058866a8fab33332bdfe"
+            },
+            "seqtk/sample": {
+                "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
+            },
+            "subread/featurecounts": {
+                "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
+            }
+        }
     }
-  }
 }

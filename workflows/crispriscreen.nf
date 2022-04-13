@@ -42,6 +42,7 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 // MODULE: Local non nf-core modules
 //
 include { PREPARE_LIBRARY } from '../modules/local/prepare_library'
+include { FITNESS } from '../modules/local/calculate_fitness'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -54,6 +55,7 @@ include { PREPARE_LIBRARY } from '../modules/local/prepare_library'
 //
 include { FASTQC                      } from '../modules/nf-core/modules/fastqc/main'
 include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
+include { SEQTK_SAMPLE                } from '../modules/nf-core/modules/seqtk/sample/main'
 include { BOWTIE2_BUILD               } from '../modules/nf-core/modules/bowtie2/build/main'
 include { BOWTIE2_ALIGN               } from '../modules/nf-core/modules/bowtie2/align/main'
 include { SUBREAD_FEATURECOUNTS       } from '../modules/nf-core/modules/subread/featurecounts/main'
@@ -87,12 +89,26 @@ workflow CRISPRISCREEN {
         ch_fasta
     )
     ch_versions = ch_versions.mix(PREPARE_LIBRARY.out.versions)
-
+    
+    //
+    // MODULE: Run Seqtk/sample (optional)
+    //
+    ch_reads = Channel.empty()
+    if (params.subsampling) {
+        SEQTK_SAMPLE (
+            INPUT_CHECK.out.reads, params.sample_size
+        )
+        ch_reads = SEQTK_SAMPLE.out.reads
+        ch_versions = ch_versions.mix(SEQTK_SAMPLE.out.versions)
+    } else {
+        ch_reads = INPUT_CHECK.out.reads
+    }
+    
     //
     // MODULE: Run FastQC
     //
     FASTQC (
-        INPUT_CHECK.out.reads
+        ch_reads
     )
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
     
@@ -108,7 +124,7 @@ workflow CRISPRISCREEN {
     // MODULE: Bowtie2  - align (filtered) reads to reference
     //
     BOWTIE2_ALIGN (
-        INPUT_CHECK.out.reads, BOWTIE2_BUILD.out.index, params.save_unaligned
+        ch_reads, BOWTIE2_BUILD.out.index, params.save_unaligned
     )
     ch_versions = ch_versions.mix(BOWTIE2_ALIGN.out.versions)
     
@@ -125,7 +141,15 @@ workflow CRISPRISCREEN {
         ch_featurecounts
     )
     ch_versions = ch_versions.mix(SUBREAD_FEATURECOUNTS.out.versions.first())
-    
+
+    //
+    // MODULE: Calculate guide RNA and gene fitness score from read counts using DESeq2
+    //
+    //FITNESS (
+    //    SUBREAD_FEATURECOUNTS.out.counts, ch_input
+    //)
+    //ch_versions = ch_versions.mix(FITNESS.out.versions)
+
     //
     // MODULE: Dump Software Versions
     //
