@@ -235,7 +235,7 @@
                 },
                 "sample_size": {
                     "type": "integer",
-                    "description": "Number of reads that are sampled per input file if subsampling is true",
+                    "description": "Number of reads that are sampled per input file if subsampling is true.",
                     "default": 10000,
                     "fa_icon": "fas fa-check-square",
                     "hidden": true
@@ -249,14 +249,35 @@
                 },
                 "save_unaligned": {
                     "type": "boolean",
-                    "description": "Whether to export unaligned reads from bowtie2 output or not",
+                    "description": "Whether to export unaligned reads from bowtie2 output or not.",
                     "default": false,
+                    "fa_icon": "fas fa-check-square",
+                    "hidden": true
+                },
+                "normalization": {
+                    "type": "boolean",
+                    "description": "If true, read counts for samples of identical time points are quantile normalized. Can be useful to counter act biases between different samples of the same time point, e.g. caused by under- or over-estimation of generation time.",
+                    "default": false,
+                    "fa_icon": "fas fa-check-square",
+                    "hidden": true
+                },
+                "gene_fitness": {
+                    "type": "boolean",
+                    "description": "Whether to calculate gene fitness from single sgRNA mutant or transposon fitness. Usually used for all types of barcode sequencing where several guide RNAs or transposons target the same gene.",
+                    "default": true,
+                    "fa_icon": "fas fa-check-square",
+                    "hidden": true
+                },
+                "gene_sep": {
+                    "type": "string",
+                    "description": "A string or symbol that separates target (gene) name from guide RNA index or transposon location in the fasta file. Usually used for all types of barcode sequencing where several guide RNAs or transposons target the same gene.",
+                    "default": "\\|",
                     "fa_icon": "fas fa-check-square",
                     "hidden": true
                 },
                 "validate_params": {
                     "type": "boolean",
-                    "description": "Boolean whether to validate parameters against the schema at runtime",
+                    "description": "Boolean whether to validate parameters against the schema at runtime.",
                     "default": true,
                     "fa_icon": "fas fa-check-square",
                     "hidden": true

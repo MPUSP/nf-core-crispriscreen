@@ -131,24 +131,30 @@ workflow CRISPRISCREEN {
     //
     // MODULE: Subread/featureCounts - generates statistics about read counts per gene
     //
-    ch_featurecounts = Channel.empty()
-    ch_featurecounts = BOWTIE2_ALIGN.out.bam
-    ch_featurecounts
+    ch_bowtiebam = Channel.empty()
+    ch_bowtiebam = BOWTIE2_ALIGN.out.bam
+    ch_bowtiebam
         .combine(PREPARE_LIBRARY.out.annotation)
-        .set { ch_featurecounts }
+        .set { ch_bowtiebam }
 
     SUBREAD_FEATURECOUNTS (
-        ch_featurecounts
+        ch_bowtiebam
     )
     ch_versions = ch_versions.mix(SUBREAD_FEATURECOUNTS.out.versions.first())
 
     //
     // MODULE: Calculate guide RNA and gene fitness score from read counts using DESeq2
     //
-    //FITNESS (
-    //    SUBREAD_FEATURECOUNTS.out.counts, ch_input
-    //)
-    //ch_versions = ch_versions.mix(FITNESS.out.versions)
+    ch_featurecounts = Channel.empty()
+    ch_featurecounts = SUBREAD_FEATURECOUNTS.out.counts
+    ch_featurecounts
+        .collect() 
+        .set { ch_featurecounts }
+
+    FITNESS (
+        ch_input, ch_featurecounts, params.normalization, params.gene_fitness, params.gene_sep
+    )
+    ch_versions = ch_versions.mix(FITNESS.out.versions)
 
     //
     // MODULE: Dump Software Versions
