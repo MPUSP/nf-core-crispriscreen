@@ -2,7 +2,7 @@ process FITNESS {
     tag "$fitness"
     label "process_low"
 
-    conda (params.enable_conda ? "conda-forge::r-base=4.0 bioconda::bioconductor-deseq2=1.28.0 conda-forge::r-tidyverse bioconda::bioconductor-limma" : null)
+    conda (params.enable_conda ? "conda-forge::r-base=4.0 conda-forge::r-tidyverse bioconda::bioconductor-deseq2=1.28.0 bioconda::bioconductor-biocparallel bioconda::bioconductor-limma" : null)
 
     input:
     path samplesheet
@@ -29,6 +29,8 @@ process FITNESS {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         r-base: \$(echo \$(R --version 2>&1) | sed 's/^.*R version //; s/ .*\$//')
+        bioconductor-deseq2: \$(Rscript -e "library(DESeq2); cat(as.character(packageVersion('DESeq2')))")
+        bioconductor-limma: \$(Rscript -e "library(limma); cat(as.character(packageVersion('limma')))")
     END_VERSIONS
     """
 }
