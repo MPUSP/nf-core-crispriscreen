@@ -163,6 +163,110 @@
                 }
             }
         },
+        "subsampling_options": {
+            "title": "Subsampling options",
+            "type": "object",
+            "fa_icon": "fas fa-cut",
+            "description": "Options to subsample (reduce number of) reads from samples.",
+            "properties": {
+                "subsampling": {
+                    "type": "boolean",
+                    "description": "Whether to subsample input reads.",
+                    "default": false,
+                    "fa_icon": "fas fa-check-square",
+                    "hidden": true
+                },
+                "sample_size": {
+                    "type": "integer",
+                    "description": "Number of reads that are sampled per input file if subsampling is true.",
+                    "default": 10000,
+                    "fa_icon": "fas fa-check-square",
+                    "hidden": true
+                },
+                "fixed_seed": {
+                    "type": "boolean",
+                    "description": "Whether the same reads (by position) should be sampled from input files. Can be useful for paired end reads.",
+                    "default": false,
+                    "fa_icon": "fas fa-check-square",
+                    "hidden": true
+                }
+            }
+        },
+        "read_trimming_options": {
+            "title": "Read trimming options",
+            "type": "object",
+            "fa_icon": "fas fa-cut",
+            "description": "Options to adjust read trimming criteria.",
+            "properties": {
+                "clip_r1": {
+                    "type": "integer",
+                    "description": "Instructs Trim Galore to remove bp from the 5' end of read 1 (or single-end reads).",
+                    "fa_icon": "fas fa-cut"
+                },
+                "clip_r2": {
+                    "type": "integer",
+                    "description": "Instructs Trim Galore to remove bp from the 5' end of read 2 (paired-end reads only).",
+                    "fa_icon": "fas fa-cut"
+                },
+                "three_prime_clip_r1": {
+                    "type": "integer",
+                    "description": "Instructs Trim Galore to remove bp from the 3' end of read 1 AFTER adapter/quality trimming has been performed.",
+                    "fa_icon": "fas fa-cut"
+                },
+                "three_prime_clip_r2": {
+                    "type": "integer",
+                    "description": "Instructs Trim Galore to remove bp from the 3' end of read 2 AFTER adapter/quality trimming has been performed.",
+                    "fa_icon": "fas fa-cut"
+                },
+                "trim_nextseq": {
+                    "type": "integer",
+                    "description": "Instructs Trim Galore to apply the --nextseq=X option, to trim based on quality after removing poly-G tails.",
+                    "help_text": "This enables the option Cutadapt `--nextseq-trim=3'CUTOFF` option via Trim Galore, which will set a quality cutoff (that is normally given with -q instead), but qualities of G bases are ignored. This trimming is in common for the NextSeq- and NovaSeq-platforms, where basecalls without any signal are called as high-quality G bases.",
+                    "fa_icon": "fas fa-cut"
+                },
+                "skip_trimming": {
+                    "type": "boolean",
+                    "description": "Skip the adapter trimming step.",
+                    "help_text": "Use this if your input FastQ files have already been trimmed outside of the workflow or if you're very confident that there is no adapter contamination in your data.",
+                    "fa_icon": "fas fa-fast-forward"
+                },
+                "save_trimmed": {
+                    "type": "boolean",
+                    "description": "Save the trimmed FastQ files in the results directory.",
+                    "help_text": "By default, trimmed FastQ files will not be saved to the results directory. Specify this flag (or set to true in your config file) to copy these files to the results directory when complete.",
+                    "fa_icon": "fas fa-save"
+                }
+            }
+        },
+        "fitness_calculation_options": {
+            "title": "Fitness calculation options",
+            "type": "object",
+            "fa_icon": "fas fa-cut",
+            "description": "Options to determine per mutant and per gene fitness scores.",
+            "properties": {
+                "normalization": {
+                    "type": "boolean",
+                    "description": "If true, read counts for samples of identical time points are quantile normalized. Can be useful to counter act biases between different samples of the same time point, e.g. caused by under- or over-estimation of generation time.",
+                    "default": false,
+                    "fa_icon": "fas fa-check-square",
+                    "hidden": true
+                },
+                "gene_fitness": {
+                    "type": "boolean",
+                    "description": "Whether to calculate gene fitness from single sgRNA mutant or transposon fitness. Usually used for all types of barcode sequencing where several guide RNAs or transposons target the same gene.",
+                    "default": true,
+                    "fa_icon": "fas fa-check-square",
+                    "hidden": true
+                },
+                "gene_sep": {
+                    "type": "string",
+                    "description": "A string or symbol that separates target (gene) name from guide RNA index or transposon location in the fasta file. Usually used for all types of barcode sequencing where several guide RNAs or transposons target the same gene.",
+                    "default": "\\|",
+                    "fa_icon": "fas fa-check-square",
+                    "hidden": true
+                }
+            }
+        },
         "generic_options": {
             "title": "Generic options",
             "type": "object",
@@ -226,52 +330,10 @@
                     "fa_icon": "fas fa-cogs",
                     "hidden": true
                 },
-                "subsampling": {
-                    "type": "boolean",
-                    "description": "Whether to subsample input reads.",
-                    "default": false,
-                    "fa_icon": "fas fa-check-square",
-                    "hidden": true
-                },
-                "sample_size": {
-                    "type": "integer",
-                    "description": "Number of reads that are sampled per input file if subsampling is true.",
-                    "default": 10000,
-                    "fa_icon": "fas fa-check-square",
-                    "hidden": true
-                },
-                "fixed_seed": {
-                    "type": "boolean",
-                    "description": "Whether the same reads (by position) should be sampled from input files. Can be useful for paired end reads.",
-                    "default": false,
-                    "fa_icon": "fas fa-check-square",
-                    "hidden": true
-                },
                 "save_unaligned": {
                     "type": "boolean",
                     "description": "Whether to export unaligned reads from bowtie2 output or not.",
                     "default": false,
-                    "fa_icon": "fas fa-check-square",
-                    "hidden": true
-                },
-                "normalization": {
-                    "type": "boolean",
-                    "description": "If true, read counts for samples of identical time points are quantile normalized. Can be useful to counter act biases between different samples of the same time point, e.g. caused by under- or over-estimation of generation time.",
-                    "default": false,
-                    "fa_icon": "fas fa-check-square",
-                    "hidden": true
-                },
-                "gene_fitness": {
-                    "type": "boolean",
-                    "description": "Whether to calculate gene fitness from single sgRNA mutant or transposon fitness. Usually used for all types of barcode sequencing where several guide RNAs or transposons target the same gene.",
-                    "default": true,
-                    "fa_icon": "fas fa-check-square",
-                    "hidden": true
-                },
-                "gene_sep": {
-                    "type": "string",
-                    "description": "A string or symbol that separates target (gene) name from guide RNA index or transposon location in the fasta file. Usually used for all types of barcode sequencing where several guide RNAs or transposons target the same gene.",
-                    "default": "\\|",
                     "fa_icon": "fas fa-check-square",
                     "hidden": true
                 },
@@ -310,6 +372,15 @@
         },
         {
             "$ref": "#/definitions/max_job_request_options"
+        },
+        {
+            "$ref": "#/definitions/subsampling_options"
+        },
+        {
+            "$ref": "#/definitions/read_trimming_options"
+        },
+        {
+            "$ref": "#/definitions/fitness_calculation_options"
         },
         {
             "$ref": "#/definitions/generic_options"

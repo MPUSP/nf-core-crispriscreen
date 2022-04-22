@@ -55,6 +55,7 @@ include { FITNESS } from '../modules/local/calculate_fitness'
 //
 include { FASTQC                      } from '../modules/nf-core/modules/fastqc/main'
 include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
+include { TRIMGALORE                  } from '../modules/nf-core/modules/trimgalore/main'
 include { SEQTK_SAMPLE                } from '../modules/nf-core/modules/seqtk/sample/main'
 include { BOWTIE2_BUILD               } from '../modules/nf-core/modules/bowtie2/build/main'
 include { BOWTIE2_ALIGN               } from '../modules/nf-core/modules/bowtie2/align/main'
@@ -105,10 +106,24 @@ workflow CRISPRISCREEN {
     }
     
     //
+    // MODULE: Run Trim galore to cut adapters and filter by quality
+    //
+    ch_trimmedreads = Channel.empty()
+    if (params.skip_trimming) {
+        ch_trimmedreads = ch_reads
+    } else {
+        TRIMGALORE (
+            ch_reads
+        )
+        ch_trimmedreads = TRIMGALORE.out.reads
+        ch_versions = ch_versions.mix(TRIMGALORE.out.versions)
+    }
+
+    //
     // MODULE: Run FastQC
     //
     FASTQC (
-        ch_reads
+        ch_trimmedreads
     )
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
     
@@ -124,7 +139,7 @@ workflow CRISPRISCREEN {
     // MODULE: Bowtie2  - align (filtered) reads to reference
     //
     BOWTIE2_ALIGN (
-        ch_reads, BOWTIE2_BUILD.out.index, params.save_unaligned
+        ch_trimmedreads, BOWTIE2_BUILD.out.index, params.save_unaligned
     )
     ch_versions = ch_versions.mix(BOWTIE2_ALIGN.out.versions)
     
@@ -175,7 +190,10 @@ workflow CRISPRISCREEN {
     ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(TRIMGALORE.out.zip.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(TRIMGALORE.out.log.collect{it[1]}.ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(SUBREAD_FEATURECOUNTS.out.summary.collect{it[1]}.ifEmpty([]))
+    
 
     MULTIQC (
         ch_multiqc_files.collect()
