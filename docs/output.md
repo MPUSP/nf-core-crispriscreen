@@ -6,21 +6,32 @@ This document describes the output produced by the pipeline. Most of the plots a
 
 The directories listed below will be created in the results directory after the pipeline has finished. All paths are relative to the top-level results directory.
 
-<!-- TODO nf-core: Write this documentation describing your workflow's output -->
-
 ## Pipeline overview
 
 The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes data using the following steps:
 
-1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
-2. Adapter and quality trimming ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
-3. Preparation of `*.fasta` library (custom [R script](https://cran.r-project.org/))
-4. Alignment using ([`Bowtie2`](http://multiqc.info/))
+1. Sub-sampling of reads ([Seqtk/sample](https://github.com/lh3/seqtk), optional)
+2. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
+3. Adapter and quality trimming ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
+4. Preparation of `*.fasta` library (custom [R script](https://cran.r-project.org/))
+5. Alignment using ([`Bowtie2`](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml))
    1. Build index from `*.fasta` library
    2. Align reads to library
-5. Count reads per target and input file ([`subread/featurecounts`](https://nf-co.re/modules/subread_featurecounts))
-6. Quantify gene fitness score from mulitple targets per gene, report statistics ([DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html))
-7. Present QC for raw and mapped reads ([`MultiQC`](http://multiqc.info/))
+6. Count reads per target and input file ([`subread/featurecounts`](https://nf-co.re/modules/subread_featurecounts))
+7. Quantify gene fitness score from multiple targets per gene, report statistics ([DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html))
+8. Present QC for raw and mapped reads ([`MultiQC`](http://multiqc.info/))
+
+### Seqtk/Sample
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `seqtk/`
+  - `*.subsampled.fastq.gz`: Subsampled compressed `fastq.gz` sequencing reads.
+
+</details>
+
+Sub-sampling of reads ([Seqtk/sample](https://github.com/lh3/seqtk), optional).
 
 ### FastQC
 
@@ -42,6 +53,18 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 ![MultiQC - FastQC adapter content plot](images/mqc_fastqc_adapter.png)
 
 > **NB:** The FastQC plots displayed in the MultiQC report shows _untrimmed_ reads. They may contain adapter sequence and potentially regions with low quality.
+
+### Trimgalore
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `trimgalore/`
+  - `*_trimming_report.txt`: Report of the trimming results for each `*.fastq.gz` input file.
+
+</details>
+
+Adapter and quality trimming of reads ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/)).
 
 ### Bowtie2
 
@@ -78,12 +101,39 @@ This is the input for fitness score calculation with DESeq2.
 <details markdown="1">
 <summary>Output files</summary>
 
-- `To be added`
-  - `To be added`: To be added.
+- `fitness/`
+  - `all_counts.tsv`: A summary table with all read counts per target (gene, barcode, sgRNA, ...), concatenated from the individual [#featurecounts] output files.
+  - `result.tsv`: Table with fitness scores and other statistics for all conditions in `*.tsv` format.
+  - `result.Rdata`: Table with fitness scores and other statistics for all conditions in memory-efficient `*.Rdata` format. Can be read into `R` using `load("result.Rdata`).
 
 </details>
 
-A custom R script employing [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html) to quantify gene fitness score from multiple targets per gene, and reports statistics.
+A custom R script employing [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html) to quantify gene fitness score from multiple targets per gene, reporting different summary statistics. The final output of this module is a table in `*.txt` and `*.Rdata` format with the following columns:
+
+| Column               | Type      | Example    | Comment                                                 |
+| -------------------- | --------- | ---------- | ------------------------------------------------------- |
+| sgRNA                | `chr`     | `aat_111`  | name of sgRNA as in `.fasta` reference                  |
+| sgRNA_target         | `chr`     | aat        | name of sgRNA target gene                               |
+| sgRNA_position       | `numeric` | 111        | position of sgRNA relative to target start              |
+| condition            | `chr`     | example    | experimental condition                                  |
+| date                 | `chr`     | 2021_01_09 | experiment date                                         |
+| time                 | `numeric` | 0          | time / n generations, important for fitness calculation |
+| group                | `numeric` | 1          | group number for sample                                 |
+| reference_group      | `numeric` | 1          | group number of reference for comparison                |
+| baseMean             | `numeric` | `NA`       | DESeq2 average number of reads for sgRNA                |
+| log2FoldChange       | `numeric` | 0          | DESeq2 log2 FC for sgRNA                                |
+| lfcSE                | `numeric` | 0          | DESeq2 log2 FC error for sgRNA                          |
+| stat                 | `numeric` | `NA`       | DESeq2 t statistic for sgRNA                            |
+| pvalue               | `numeric` | 1          | DESeq2 p-value for sgRNA                                |
+| padj                 | `numeric` | 1          | DESeq2 adjusted p-value for sgRNA                       |
+| fitness              | `numeric` | 2.020183   | fitness for sgRNA                                       |
+| sgRNA_index          | `numeric` | 4          | relative position of sgRNA                              |
+| sgRNA_correlation    | `numeric` | 0.6247412  | correlation of sgRNA with others                        |
+| sgRNA_efficiency     | `numeric` | 0.9893041  | relative repression efficiency of sgRNA                 |
+| wmean_log2FoldChange | `numeric` | 0          | weighted mean log2 FC for gene                          |
+| sd_log2FoldChange    | `numeric` | 0          | standard deviation of log2 FC for gene                  |
+| wmean_fitness        | `numeric` | 1.777574   | weighted mean fitness for gene                          |
+| sd_fitness           | `numeric` | 0.9558989  | standard dev of fitness for gene                        |
 
 ### MultiQC
 
