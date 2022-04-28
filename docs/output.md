@@ -10,16 +10,17 @@ The directories listed below will be created in the results directory after the 
 
 The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes data using the following steps:
 
-1. Sub-sampling of reads ([Seqtk/sample](https://github.com/lh3/seqtk), optional)
+1. Sub-sampling of reads ([`Seqtk/sample`](https://github.com/lh3/seqtk), optional)
 2. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 3. Adapter and quality trimming ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
-4. Preparation of `*.fasta` library (custom [R script](https://cran.r-project.org/))
+4. Preparation of `*.fasta` library (custom [`R` script](https://cran.r-project.org/))
 5. Alignment using ([`Bowtie2`](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml))
    1. Build index from `*.fasta` library
    2. Align reads to library
 6. Count reads per target and input file ([`subread/featurecounts`](https://nf-co.re/modules/subread_featurecounts))
-7. Quantify gene fitness score from multiple targets per gene, report statistics ([DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html))
-8. Present QC for raw and mapped reads ([`MultiQC`](http://multiqc.info/))
+7. Quantify gene fitness score from multiple targets per gene, report statistics ([`DESeq2`](https://bioconductor.org/packages/release/bioc/html/DESeq2.html))
+8. Generate HTML report with fitness results ([`R markdown`](https://nf-co.re/modules/rmarkdownnotebook))
+9. Present QC for raw and mapped reads ([`MultiQC`](http://multiqc.info/))
 
 ### Seqtk/Sample
 
@@ -134,6 +135,18 @@ A custom R script employing [DESeq2](https://bioconductor.org/packages/release/b
 | sd_log2FoldChange    | `numeric` | 0          | standard deviation of log2 FC for gene                  |
 | wmean_fitness        | `numeric` | 1.777574   | weighted mean fitness for gene                          |
 | sd_fitness           | `numeric` | 0.9558989  | standard dev of fitness for gene                        |
+
+### R markdown report
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `fitness_report/`
+  - `fitness_summary.nb.html`: HTML report with information about all samples and fitness scores.
+
+</details>
+
+A custom R markdown template is used to render an HTML report with information about all samples, their number of mapped reads, barcodes, genes, fitness scores, and other information.
 
 ### MultiQC
 

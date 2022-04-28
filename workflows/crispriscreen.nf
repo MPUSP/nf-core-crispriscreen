@@ -60,6 +60,7 @@ include { SEQTK_SAMPLE                } from '../modules/nf-core/modules/seqtk/s
 include { BOWTIE2_BUILD               } from '../modules/nf-core/modules/bowtie2/build/main'
 include { BOWTIE2_ALIGN               } from '../modules/nf-core/modules/bowtie2/align/main'
 include { SUBREAD_FEATURECOUNTS       } from '../modules/nf-core/modules/subread/featurecounts/main'
+include { RMARKDOWNNOTEBOOK           } from '../modules/nf-core/modules/rmarkdownnotebook/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
 
 /*
@@ -170,6 +171,23 @@ workflow CRISPRISCREEN {
         ch_input, ch_featurecounts, params.normalization, params.gene_fitness, params.gene_sep
     )
     ch_versions = ch_versions.mix(FITNESS.out.versions)
+
+    //
+    // MODULE: R markdown rendering the final fitness report
+    //
+    ch_rmdtemplate = [ [ id:'fitness_summary' ],
+        file("$projectDir/bin/fitness_summary.Rmd", checkIfExists: true) ]
+    ch_fitness = Channel.empty()
+    ch_fitness = ch_fitness.mix(Channel.from(FITNESS.out.allcounts))
+    ch_fitness = ch_fitness.mix(Channel.from(FITNESS.out.rdata))
+    ch_fitness
+        .collect() 
+        .set { ch_fitness }
+
+    RMARKDOWNNOTEBOOK (
+        ch_rmdtemplate, [:], ch_fitness
+    )
+    ch_versions = ch_versions.mix(RMARKDOWNNOTEBOOK.out.versions)
 
     //
     // MODULE: Dump Software Versions

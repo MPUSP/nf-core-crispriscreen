@@ -1,13 +1,12 @@
 # ![nf-core/crispriscreen](docs/images/nf-core-crispriscreen_logo_light.png#gh-light-mode-only) ![nf-core/crispriscreen](docs/images/nf-core-crispriscreen_logo_dark.png#gh-dark-mode-only)
 
-[![GitHub Actions CI Status](https://github.com/m-jahn/nf-core-crispriscreen/workflows/nf-core%20CI/badge.svg)](https://github.com/m-jahn/nf-core-crispriscreen/actions?query=workflow%3A%22nf-core+CI%22)
-[![GitHub Actions Linting Status](https://github.com/m-jahn/nf-core-crispriscreen/workflows/nf-core%20linting/badge.svg)](https://github.com/m-jahn/nf-core-crispriscreen/actions?query=workflow%3A%22nf-core+linting%22)
-
 <!--
 [![AWS CI](https://img.shields.io/badge/CI%20tests-full%20size-FF9900?labelColor=000000&logo=Amazon%20AWS)](https://nf-co.re/crispriscreen/results)
 [![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.XXXXXXX-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.XXXXXXX)
 -->
 
+[![GitHub Actions CI Status](https://github.com/m-jahn/nf-core-crispriscreen/workflows/nf-core%20CI/badge.svg)](https://github.com/m-jahn/nf-core-crispriscreen/actions?query=workflow%3A%22nf-core+CI%22)
+[![GitHub Actions Linting Status](https://github.com/m-jahn/nf-core-crispriscreen/workflows/nf-core%20linting/badge.svg)](https://github.com/m-jahn/nf-core-crispriscreen/actions?query=workflow%3A%22nf-core+linting%22)
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A521.10.3-23aa62.svg?labelColor=000000)](https://www.nextflow.io/)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
 [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
@@ -29,16 +28,17 @@ On release, automated continuous integration tests run the pipeline on a full-si
 
 ## Pipeline summary
 
-1. Sub-sampling of reads ([Seqtk/sample](https://github.com/lh3/seqtk), optional)
+1. Sub-sampling of reads ([`Seqtk/sample`](https://github.com/lh3/seqtk), optional)
 2. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 3. Adapter and quality trimming ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
-4. Preparation of `*.fasta` library (custom [R script](https://cran.r-project.org/))
+4. Preparation of `*.fasta` library (custom [`R` script](https://cran.r-project.org/))
 5. Alignment using ([`Bowtie2`](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml))
    1. Build index from `*.fasta` library
    2. Align reads to library
 6. Count reads per target and input file ([`subread/featurecounts`](https://nf-co.re/modules/subread_featurecounts))
-7. Quantify gene fitness score from multiple targets per gene, report statistics ([DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html))
-8. Present QC for raw and mapped reads ([`MultiQC`](http://multiqc.info/))
+7. Quantify gene fitness score from multiple targets per gene, report statistics ([`DESeq2`](https://bioconductor.org/packages/release/bioc/html/DESeq2.html))
+8. Generate HTML report with fitness results ([`R markdown`](https://nf-co.re/modules/rmarkdownnotebook))
+9. Present QC for raw and mapped reads ([`MultiQC`](http://multiqc.info/))
 
 ## Quick Start
 
