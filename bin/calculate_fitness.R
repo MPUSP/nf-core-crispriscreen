@@ -16,10 +16,11 @@
 # input arguments
 args <- commandArgs(trailingOnly = TRUE)
 path_samplesheet <- args[1]                 # file paths to sample sheet
-path_counts <- args[2]                      # file paths to count tables
-normalization <- as.logical(args[3])        # default: FALSE
-gene_fitness <- as.logical(args[4])         # default: TRUE
-gene_sep <- args[5]                         # default: '|' aka the pipe symbol
+number_cores <- args[2]                     # number of CPU cores
+path_counts <- args[3]                      # file paths to count tables
+normalization <- as.logical(args[4])        # default: FALSE
+gene_fitness <- as.logical(args[5])         # default: TRUE
+gene_sep <- args[6]                         # default: '|' aka the pipe symbol
 
 # LOAD PACKAGES
 # ====================
@@ -39,7 +40,7 @@ library(dplyr)
 library(purrr)
 
 # Bioconductor packages
-list_bioc_packages <- c("DESeq2")
+list_bioc_packages <- c("DESeq2", "BiocParallel")
 if (normalization) {
     list_bioc_packages <- c(list_bioc_packages, "limma")
 }
@@ -52,6 +53,7 @@ if (length(list_to_install)) {
 }
 
 library(DESeq2)
+library(BiocParallel)
 if (normalization) {library(limma)}
 
 # DATA PREPARATION
@@ -120,6 +122,7 @@ if (normalization) {
 # Love, M.I., Huber, W., Anders, S. Genome Biology, 15:550, 2014.
 # (https://doi.org/10.1186/s13059-014-0550-8)
 message("Running DESeq2 for pairwise comparison.\nNote: this step can be time and computation-intense.")
+message(paste0("Number of CPU cores used for DESeq parallel execution: ", number_cores, "."))
 
 # 2. Meta data
 # Meta data is required to carry out the actual DESeq2 analysis
@@ -147,8 +150,10 @@ combinations <- df_samplesheet %>%
 
 # extract results for desired combinations
 DESeq_result_table <- lapply(combinations, function(l) {
-    DESeq2::results(DESeq_result, contrast = c("group", l$group, l$reference_group),
-        parallel = TRUE, tidy = TRUE) %>%
+    DESeq2::results(DESeq_result,
+        contrast = c("group", l$group, l$reference_group),
+        parallel = TRUE, BPPARAM = MulticoreParam(number_cores),
+        tidy = TRUE) %>%
         tibble::as_tibble() %>% dplyr::mutate(group = l$group) %>%
         dplyr::rename(sgRNA = row)
     }) %>% dplyr::bind_rows()

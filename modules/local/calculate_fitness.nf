@@ -1,6 +1,6 @@
 process FITNESS {
     tag "$fitness"
-    label "process_low"
+    label "process_high"
 
     conda (params.enable_conda ? "conda-forge::r-base=4.0 conda-forge::r-tidyverse bioconda::bioconductor-deseq2=1.28.0 bioconda::bioconductor-biocparallel bioconda::bioconductor-limma" : null)
 
@@ -21,6 +21,7 @@ process FITNESS {
     """
     calculate_fitness.R \\
         $samplesheet \\
+        $task.cpus \\
         "${counts}" \\
         "${normalization}" \\
         "${gene_fitness}" \\

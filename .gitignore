@@ -8,5 +8,4 @@ testing*
 *.pyc
 *.Rproj.user
 *.Rproj
-test/*
 .Rproj.user
