@@ -1,5 +1,5 @@
 process PREPARE_LIBRARY {
-    tag "$prepare_libary"
+    tag "$fasta"
     label "process_low"
 
     conda (params.enable_conda ? "conda-forge::r-base=4.0" : null)
