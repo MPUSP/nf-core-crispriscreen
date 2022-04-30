@@ -16,11 +16,12 @@
 # input arguments
 args <- commandArgs(trailingOnly = TRUE)
 path_samplesheet <- args[1]                 # file paths to sample sheet
-number_cores <- args[2]                     # number of CPU cores
-path_counts <- args[3]                      # file paths to count tables
-normalization <- as.logical(args[4])        # default: FALSE
-gene_fitness <- as.logical(args[5])         # default: TRUE
-gene_sep <- args[6]                         # default: '|' aka the pipe symbol
+path_counts <- args[2]                      # file paths to count tables
+normalization <- as.logical(args[3])        # default: FALSE
+gene_fitness <- as.logical(args[4])         # default: TRUE
+gene_sep <- args[5]                         # default: '|' aka the pipe symbol
+number_cores <- args[6]                     # number of CPU cores
+
 
 # LOAD PACKAGES
 # ====================
@@ -67,10 +68,7 @@ df_samplesheet <- readr::read_csv(path_samplesheet, col_types = cols()) %>%
 stopifnot(is.numeric(df_samplesheet$time))
 n_timepoints <- length(unique(df_samplesheet$time))
 
-# Step 2: Load read counts
-df_counts <- stringr::str_sub(path_counts, 2, nchar(path_counts)-1) %>%
-    stringr::str_remove_all("\\[[a-zA-Z0-9,:_\\- ]*\\], ") %>%
-    stringr::str_split(string = ., pattern = ", ") %>% {.[[1]]} %>%
+df_counts <- list.files(path = getwd(), full.names = TRUE, pattern = ".featureCounts.txt$") %>%
     lapply(function(x) {
         df <- readr::read_tsv(x, col_types = cols(), skip = 1)
         df <- tidyr::pivot_longer(df, cols = matches("*.\\.bam"),

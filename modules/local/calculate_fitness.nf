@@ -1,12 +1,12 @@
 process FITNESS {
-    tag "$fitness"
+    tag "$samplesheet"
     label "process_high"
 
     conda (params.enable_conda ? "conda-forge::r-base=4.0 conda-forge::r-tidyverse bioconda::bioconductor-deseq2=1.28.0 bioconda::bioconductor-biocparallel bioconda::bioconductor-limma" : null)
 
     input:
     path samplesheet
-    val counts
+    path counts
     val normalization
     val gene_fitness
     val gene_sep
@@ -19,13 +19,14 @@ process FITNESS {
 
     script: // This script is bundled with the pipeline, in nf-core/crispriscreen/bin/
     """
-    calculate_fitness.R \\
-        $samplesheet \\
-        $task.cpus \\
-        "${counts}" \\
-        "${normalization}" \\
-        "${gene_fitness}" \\
-        "${gene_sep}"
+    calculate_fitness.R \
+        $samplesheet \
+        "${counts}" \
+        "${normalization}" \
+        "${gene_fitness}" \
+        "${gene_sep}" \
+        $task.cpus
+
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
