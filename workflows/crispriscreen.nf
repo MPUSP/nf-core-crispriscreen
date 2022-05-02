@@ -82,7 +82,7 @@ workflow CRISPRISCREEN {
         ch_input
     )
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
-    
+
     //
     // MODULE: Convert *.fasta input file to pseudo genome database (*.saf)
     //
@@ -90,7 +90,7 @@ workflow CRISPRISCREEN {
         ch_fasta
     )
     ch_versions = ch_versions.mix(PREPARE_LIBRARY.out.versions)
-    
+
     //
     // MODULE: Run Seqtk/sample (optional)
     //
@@ -104,7 +104,7 @@ workflow CRISPRISCREEN {
     } else {
         ch_reads = INPUT_CHECK.out.reads
     }
-    
+
     //
     // MODULE: Run Trim galore to cut adapters and filter by quality
     //
@@ -126,7 +126,7 @@ workflow CRISPRISCREEN {
         ch_trimmedreads
     )
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
-    
+
     //
     // MODULE: Bowtie2  - build genome database index from fasta input
     //
@@ -134,7 +134,7 @@ workflow CRISPRISCREEN {
         ch_fasta
     )
     ch_versions = ch_versions.mix(BOWTIE2_BUILD.out.versions)
-    
+
     //
     // MODULE: Bowtie2  - align (filtered) reads to reference
     //
@@ -142,7 +142,7 @@ workflow CRISPRISCREEN {
         ch_trimmedreads, BOWTIE2_BUILD.out.index, params.save_unaligned
     )
     ch_versions = ch_versions.mix(BOWTIE2_ALIGN.out.versions)
-    
+
     //
     // MODULE: Subread/featureCounts - generates statistics about read counts per gene
     //
@@ -173,20 +173,17 @@ workflow CRISPRISCREEN {
     ch_versions = ch_versions.mix(FITNESS.out.versions)
 
     //
-    // MODULE: R markdown rendering the final fitness report
+    // MODULE: R markdown rendering the final fitness reports
     //
-    ch_rmdtemplate = [ [ id:'fitness_summary' ],
-        file("$projectDir/bin/fitness_summary.Rmd", checkIfExists: true) ]
-    ch_fitness = Channel.empty()
-    ch_fitness = ch_fitness.mix(Channel.from(FITNESS.out.allcounts))
-    ch_fitness = ch_fitness.mix(Channel.from(FITNESS.out.rdata))
-    ch_fitness
-        .collect() 
-        .set { ch_fitness }
+    ch_rmdtemplate_count = [ [ id:'counts_summary' ], file("$projectDir/bin/counts_summary.Rmd", checkIfExists: true) ]
+    //ch_rmdtemplate_fit = [ [ id:'fitness_summary' ], file("$projectDir/bin/fitness_summary.Rmd", checkIfExists: true) ]
 
     RMARKDOWNNOTEBOOK (
-        ch_rmdtemplate, [:], ch_fitness
+        ch_rmdtemplate_count, [], FITNESS.out.allcounts
     )
+    //RMARKDOWNFITNESS (
+    //    ch_rmdtemplate_fit, [], FITNESS.out.rdata
+    //)
     ch_versions = ch_versions.mix(RMARKDOWNNOTEBOOK.out.versions)
 
     //
@@ -211,7 +208,6 @@ workflow CRISPRISCREEN {
     ch_multiqc_files = ch_multiqc_files.mix(TRIMGALORE.out.zip.collect{it[1]}.ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(TRIMGALORE.out.log.collect{it[1]}.ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(SUBREAD_FEATURECOUNTS.out.summary.collect{it[1]}.ifEmpty([]))
-    
 
     MULTIQC (
         ch_multiqc_files.collect()

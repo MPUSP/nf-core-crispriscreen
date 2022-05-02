@@ -20,7 +20,7 @@ path_counts <- args[2]                      # file paths to count tables
 normalization <- as.logical(args[3])        # default: FALSE
 gene_fitness <- as.logical(args[4])         # default: TRUE
 gene_sep <- args[5]                         # default: '|' aka the pipe symbol
-number_cores <- args[6]                     # number of CPU cores
+number_cores <- as.numeric(args[6])         # number of CPU cores
 
 
 # LOAD PACKAGES
@@ -71,8 +71,9 @@ n_timepoints <- length(unique(df_samplesheet$time))
 df_counts <- list.files(path = getwd(), full.names = TRUE, pattern = ".featureCounts.txt$") %>%
     lapply(function(x) {
         df <- readr::read_tsv(x, col_types = cols(), skip = 1)
-        df <- tidyr::pivot_longer(df, cols = matches("*.\\.bam"),
-            names_to = "sample", values_to = "numreads", names_transform = function(x) {str_remove(x, "\\.bam")})
+        df <- tidyr::pivot_longer(df, cols = matches("*.\\.bam$"),
+            names_to = "sample", values_to = "numreads")
+        df <- dplyr::mutate(df, sample = stringr::str_remove(sample, "\\.bam$"))
         df }) %>%
     dplyr::bind_rows() %>%
     dplyr::rename(sgRNA = Geneid) %>%

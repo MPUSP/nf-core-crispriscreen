@@ -1,0 +1,206 @@
+---
+title: "Read counts summary"
+author: "SYSTEM: `r version[13]`"
+date: "DATE: `r Sys.time()`"
+params:
+  cpus: 2
+  artifact_dir: artifacts
+  input_dir: ./
+  meta: ""
+output:
+  html_notebook:
+    theme: cosmo
+    toc: yes
+    number_sections: yes
+  html_document:
+    toc: yes
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# Requirements
+
+- loading libraries
+
+```{r, echo = TRUE}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(ggrepel)
+  library(scales)
+})
+```
+
+# Sample overview
+
+## Data import
+
+- Checking if result file(s) are available:
+
+```{r}
+# get current working directory
+wd <- getwd()
+
+# check input files and compile small table
+list_input <- grep(list.files(wd), pattern = "all_counts.tsv", value = TRUE)
+if (length(list_input) == 1) {
+  df_input <- dplyr::bind_cols(
+    data.frame(list_input),
+    file.info(paste(wd, list_input, sep = "/"))
+  )
+  rownames(df_input) <- NULL
+  print(df_input[c(1,2,3,4,5,10)])
+} else {
+  stop("Required input file 'all_counts.tsv' was not found.")
+}
+```
+
+- Importing result table(s):
+
+```{r}
+# load counts matrix
+df_counts <- readr::read_tsv(paste0(wd, "/all_counts.tsv"), col_types = cols())
+# rename variables
+df_counts <- dplyr::rename(df_counts, n_reads = numreads) %>%
+  # sort
+  arrange(sample)
+print("Import of counts table complete.")
+```
+
+## Sample table
+
+```{r}
+# list of samples + generic options
+list_samples <- unique(df_counts$sample)
+figwidth <- 9
+figheight <- round(1+(length(list_samples)/4))
+figheight2 <- 3*figheight
+
+# output sample table
+df_counts %>% group_by(sample) %>%
+  summarize(
+    barcodes = length(unique(sgRNA)),
+    total_reads = sum(n_reads, na.rm = TRUE),
+    min_reads = min(n_reads, na.rm = TRUE),
+    mean_reads = mean(n_reads, na.rm = TRUE),
+    max_reads = max(n_reads, na.rm = TRUE),
+  )
+```
+
+# Quality control
+
+```{r}
+# define a custom ggplot2 theme (just for prettiness)
+# custom ggplot2 theme that is reused for all later plots
+custom_colors = c("#E7298A", "#66A61E", "#E6AB02", "#7570B3", "#B3B3B3", "#1B9E77", "#D95F02", "#A6761D")
+custom_range <- function(n = 5) {colorRampPalette(custom_colors[c(1,5,2)])(n)}
+
+custom_theme <- function(base_size = 12, base_line_size = 1.0, base_rect_size = 1.0, ...) {
+  theme_light(base_size = base_size, base_line_size = base_line_size, base_rect_size = base_rect_size) + theme(
+    title = element_text(colour = grey(0.4), size = 10),
+    plot.margin = unit(c(12,12,12,12), "points"),
+    axis.ticks.length = unit(0.2, "cm"),
+    axis.ticks = element_line(colour = grey(0.4), linetype = "solid", lineend = "round"),
+    axis.text.x = element_text(colour = grey(0.4), size = 10),
+    axis.text.y = element_text(colour = grey(0.4), size = 10),
+    panel.grid.major = element_line(size = 0.6, linetype = "solid", colour = grey(0.9)),
+    panel.grid.minor = element_blank(),
+    panel.border = element_rect(linetype = "solid", colour = grey(0.4), fill = NA, size = 1.0),
+    panel.background = element_blank(),
+    strip.background = element_blank(),
+    strip.text = element_text(colour = grey(0.4), size = 10, margin = unit(rep(3,4), "points")),
+    legend.text = element_text(colour = grey(0.4), size = 10),
+    legend.title = element_blank(),
+    legend.background = element_blank(),
+    ...
+  )
+}
+```
+
+## QC PLOT: Total number of mapped reads per sample
+
+```{r, fig.width = figwidth, fig.height = figheight}
+df_counts %>%
+  dplyr::group_by(sample) %>% dplyr::summarize(n_reads = sum(n_reads)) %>%
+  ggplot2::ggplot(aes(x = sample, y = n_reads)) +
+  ggplot2::coord_flip() +
+  ggplot2::geom_col(fill = custom_colors[1], alpha = 0.7) +
+  ggplot2::labs(x = "", y = "total number of mapped reads") +
+  custom_theme()
+```
+
+## QC PLOT: Number of individual sgRNAs per sample
+
+```{r, fig.width = figwidth, fig.height = figheight}
+df_counts %>%
+  dplyr::group_by(sample) %>%
+  dplyr::summarize(`unique sgRNAs per sample` = sum(n_reads > 0)) %>%
+  # barchart
+  ggplot2::ggplot(aes(x = sample, y = `unique sgRNAs per sample`)) + 
+  ggplot2::geom_col(fill = custom_colors[1], alpha = 0.7) +
+  ggplot2::labs(x = "") +
+  ggplot2::coord_flip() +
+  custom_theme()
+```
+
+## QC PLOT: Number of reads per sgRNA, per sample
+
+```{r, fig.width = figwidth, fig.height = figheight2, warning = FALSE}
+df_counts %>%
+  ggplot2::ggplot(aes(x = log2(n_reads))) +
+  ggplot2::geom_histogram(fill = custom_colors[1], alpha = 0.7, bins = 30) +
+  ggplot2::labs(y = "", x = expression("log"[2]*" reads per sgRNA")) +
+  ggplot2::facet_wrap(~ sample, ncol = 2) +
+  custom_theme()
+```
+
+## QC PLOT: Top 10 most abundant sgRNAs, per sample
+
+```{r, fig.width = figwidth, fig.height = figheight2}
+df_counts %>%
+  dplyr::group_by(sample) %>%
+  dplyr::arrange(sample, dplyr::desc(n_reads)) %>% 
+  dplyr::mutate(rank = seq_along(sgRNA)) %>%
+  dplyr::filter(between(rank, 1, 10)) %>%
+  ggplot2::ggplot(aes(x = factor(rank), y = n_reads)) +
+  ggplot2::geom_col(fill = custom_colors[1], alpha = 0.7, width =1) +
+  ggplot2::labs(y = "n reads", x = "sgRNAs ranked by abundance") +
+  ggplot2::facet_wrap(~ sample, ncol = 2) +
+  custom_theme()
+```
+
+## QC PLOT: Read count distribution, per sample (max 1000 barcodes)
+
+```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE}
+df_counts %>%
+  dplyr::group_by(sample) %>% dplyr::slice(1:1000) %>%
+  # violinplot
+  ggplot2::ggplot(aes(x = sample, y = log10(n_reads))) +
+  ggplot2::geom_violin(trim = FALSE, fill = custom_colors[1],
+    alpha = 0.7, col = "white") +
+  ggplot2::coord_flip() +
+  ggplot2::stat_summary(fun.data = mean_sdl, geom = "pointrange", size = 0.5, col = grey(0.3)) +
+  custom_theme()
+```
+
+
+# Report info
+
+The template for this report is located in `./nf-core-crispriscreen/bin/counts_summary.Rmd`.
+
+Date: 2022-04-28
+
+Author: Michael Jahn, PhD
+
+Affilations:
+
+  - Science For Life Laboratory (KTH), Stockholm, Sweden
+  - Max-Planck-Unit for the Science of Pathogens, Berlin, Germany
+
+# Session Info
+
+```{r}
+sessionInfo()
+```
