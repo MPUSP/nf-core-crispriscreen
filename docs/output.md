@@ -111,30 +111,31 @@ This is the input for fitness score calculation with DESeq2.
 
 A custom R script employing [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html) to quantify gene fitness score from multiple targets per gene, reporting different summary statistics. The final output of this module is a table in `*.txt` and `*.Rdata` format with the following columns:
 
-| Column               | Type      | Example    | Comment                                                 |
-| -------------------- | --------- | ---------- | ------------------------------------------------------- |
-| sgRNA                | `chr`     | `aat_111`  | name of sgRNA as in `.fasta` reference                  |
-| sgRNA_target         | `chr`     | aat        | name of sgRNA target gene                               |
-| sgRNA_position       | `numeric` | 111        | position of sgRNA relative to target start              |
-| condition            | `chr`     | example    | experimental condition                                  |
-| date                 | `chr`     | 2021_01_09 | experiment date                                         |
-| time                 | `numeric` | 0          | time / n generations, important for fitness calculation |
-| group                | `numeric` | 1          | group number for sample                                 |
-| reference_group      | `numeric` | 1          | group number of reference for comparison                |
-| baseMean             | `numeric` | `NA`       | DESeq2 average number of reads for sgRNA                |
-| log2FoldChange       | `numeric` | 0          | DESeq2 log2 FC for sgRNA                                |
-| lfcSE                | `numeric` | 0          | DESeq2 log2 FC error for sgRNA                          |
-| stat                 | `numeric` | `NA`       | DESeq2 t statistic for sgRNA                            |
-| pvalue               | `numeric` | 1          | DESeq2 p-value for sgRNA                                |
-| padj                 | `numeric` | 1          | DESeq2 adjusted p-value for sgRNA                       |
-| fitness              | `numeric` | 2.020183   | fitness for sgRNA                                       |
-| sgRNA_index          | `numeric` | 4          | relative position of sgRNA                              |
-| sgRNA_correlation    | `numeric` | 0.6247412  | correlation of sgRNA with others                        |
-| sgRNA_efficiency     | `numeric` | 0.9893041  | relative repression efficiency of sgRNA                 |
-| wmean_log2FoldChange | `numeric` | 0          | weighted mean log2 FC for gene                          |
-| sd_log2FoldChange    | `numeric` | 0          | standard deviation of log2 FC for gene                  |
-| wmean_fitness        | `numeric` | 1.777574   | weighted mean fitness for gene                          |
-| sd_fitness           | `numeric` | 0.9558989  | standard dev of fitness for gene                        |
+| Column               | Type      | Example      | Comment                                                 |
+| -------------------- | --------- | ------------ | ------------------------------------------------------- |
+| sgRNA                | `chr`     | `aat_111`    | name of sgRNA as in `.fasta` reference                  |
+| sgRNA_target         | `chr`     | `aat`        | name of sgRNA target gene                               |
+| sgRNA_position       | `numeric` | 111          | position of sgRNA relative to target start              |
+| condition            | `chr`     | `example`    | experimental condition                                  |
+| date                 | `chr`     | `2021_01_09` | experiment date                                         |
+| time                 | `numeric` | 0            | time / n generations, important for fitness calculation |
+| group                | `numeric` | 1            | group number for sample                                 |
+| reference_group      | `numeric` | 1            | group number of reference for comparison                |
+| baseMean             | `numeric` | `NA`         | DESeq2 average number of reads for sgRNA                |
+| log2FoldChange       | `numeric` | 0            | DESeq2 log2 FC for sgRNA                                |
+| lfcSE                | `numeric` | 0            | DESeq2 log2 FC error for sgRNA                          |
+| stat                 | `numeric` | `NA`         | DESeq2 t statistic for sgRNA                            |
+| pvalue               | `numeric` | 1            | DESeq2 p-value for sgRNA                                |
+| padj                 | `numeric` | 1            | DESeq2 adjusted p-value for sgRNA                       |
+| fitness              | `numeric` | 2.020183     | fitness for sgRNA                                       |
+| sgRNA_index          | `numeric` | 4            | relative position of sgRNA                              |
+| sgRNA_correlation    | `numeric` | 0.6247412    | correlation of sgRNA with others                        |
+| sgRNA_efficiency     | `numeric` | 0.9893041    | relative repression efficiency of sgRNA                 |
+| wmean_log2FoldChange | `numeric` | 0            | weighted mean log2 FC for gene                          |
+| sd_log2FoldChange    | `numeric` | 0            | standard deviation of log2 FC for gene                  |
+| wmean_fitness        | `numeric` | 1.777574     | weighted mean fitness for gene                          |
+| sd_fitness           | `numeric` | 0.9558989    | standard dev of fitness for gene                        |
+| p_fitness            | `numeric` | 0.001        | p-value from Wilcoxon rank sum test (Null: fitness ~ 0) |
 
 ### R markdown report
 
@@ -142,7 +143,8 @@ A custom R script employing [DESeq2](https://bioconductor.org/packages/release/b
 <summary>Output files</summary>
 
 - `fitness_report/`
-  - `fitness_summary.nb.html`: HTML report with information about all samples and fitness scores.
+  - `counts_summary.nb.html`: HTML report with information about all samples and read counts.
+  - `fitness_summary.nb.html`: HTML report with information fitness score for all conditions (added soon).
 
 </details>
 

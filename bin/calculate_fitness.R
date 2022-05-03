@@ -267,7 +267,9 @@ if (n_timepoints > 1 & as.logical(gene_fitness)) {
             sd_log2FoldChange = sd(log2FoldChange),
             # gene fitness
             wmean_fitness = weighted.mean(fitness, sgRNA_correlation * sgRNA_efficiency),
-            sd_fitness = sd(fitness)
+            sd_fitness = sd(fitness),
+            # apply Wilcoxon rank sum test against Null hypothesis (fitness ~ 0)
+            p_fitness = stats::wilcox.test(x = fitness, mu = 0, alternative = "two.sided")$p.value
         ), by = c("sgRNA_target", "condition", "time")
     )
 
