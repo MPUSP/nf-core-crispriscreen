@@ -20,7 +20,8 @@ path_counts <- args[2]                      # file paths to count tables
 normalization <- as.logical(args[3])        # default: FALSE
 gene_fitness <- as.logical(args[4])         # default: TRUE
 gene_sep <- args[5]                         # default: '|' aka the pipe symbol
-number_cores <- as.numeric(args[6])         # number of CPU cores
+gene_controls <- args[6]                    # default: '' aka empty string
+number_cores <- as.numeric(args[7])         # number of CPU cores
 
 
 # LOAD PACKAGES
@@ -274,20 +275,41 @@ if (n_timepoints > 1 & as.logical(gene_fitness)) {
 if (n_timepoints > 1 & as.logical(gene_fitness)) {
 
     message("Calculating gene fitness and gene log2 fold change.")
+    if (gene_controls != "none") {
+        df_controls <- DESeq_result_table %>% ungroup %>%
+            filter(str_detect(sgRNA_target, gene_controls))
+    }
+    get_controls <- function(condition) {
+        if (gene_controls != "none") {
+            filter(df_controls, condition == condition)$fitness
+        } else {
+            NULL
+        }
+    }
+
     DESeq_result_table <- dplyr::left_join(
         DESeq_result_table,
         DESeq_result_table %>%
         dplyr::group_by(sgRNA_target, condition, time) %>%
-        dplyr::summarize(.groups = "drop",
+        dplyr::summarize(.groups = "keep",
             # gene log2 FC
             wmean_log2FoldChange = weighted.mean(log2FoldChange, sgRNA_correlation * sgRNA_efficiency),
             sd_log2FoldChange = sd(log2FoldChange),
             # gene fitness
             wmean_fitness = weighted.mean(fitness, sgRNA_correlation * sgRNA_efficiency),
             sd_fitness = sd(fitness),
-            # apply Wilcoxon rank sum test against Null hypothesis (fitness ~ 0)
-            p_fitness = stats::wilcox.test(x = fitness, mu = 0, alternative = "two.sided")$p.value
+            # apply Wilcoxon rank sum test against Null hypothesis (fitness ~ 0) or
+            # user-supplied set of controls
+            p_fitness = stats::wilcox.test(
+                x = fitness,
+                y = get_controls(condition),
+                alternative = "two.sided")$p.value
         ), by = c("sgRNA_target", "condition", "time")
+    ) %>%
+    group_by(condition, time) %>%
+    mutate(
+        p_fitness_adj = stats::p.adjust(p_fitness, method = "BH"),
+        comb_score = abs(wmean_fitness)*-log10(p_fitness_adj)
     )
 
 }

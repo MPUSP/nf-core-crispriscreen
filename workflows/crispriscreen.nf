@@ -168,7 +168,8 @@ workflow CRISPRISCREEN {
         .set { ch_featurecounts }
 
     FITNESS (
-        ch_input, ch_featurecounts, params.normalization, params.gene_fitness, params.gene_sep
+        ch_input, ch_featurecounts, params.normalization,
+        params.gene_fitness, params.gene_sep, params.gene_controls
     )
     ch_versions = ch_versions.mix(FITNESS.out.versions)
 

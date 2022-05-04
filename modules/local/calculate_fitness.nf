@@ -10,6 +10,7 @@ process FITNESS {
     val normalization
     val gene_fitness
     val gene_sep
+    val gene_controls
 
     output:
     path 'all_counts.tsv', emit: allcounts
@@ -20,11 +21,12 @@ process FITNESS {
     script: // This script is bundled with the pipeline, in nf-core/crispriscreen/bin/
     """
     calculate_fitness.R \
-        $samplesheet \
+        "${samplesheet}" \
         "${counts}" \
         "${normalization}" \
         "${gene_fitness}" \
         "${gene_sep}" \
+        "${gene_controls}" \
         $task.cpus
 
 

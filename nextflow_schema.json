@@ -264,6 +264,13 @@
                     "default": "\\|",
                     "fa_icon": "fas fa-check-square",
                     "hidden": true
+                },
+                "gene_controls": {
+                    "type": "string",
+                    "description": "A string serving as regular expression to identify control barcodes/guide RNAs. It is matched against the target (gene) names in the fasta file. It is only used for p-value calculation using 2-sample Wilcoxon rank sum test. If omitted (the default), a 1-sample test is conducted",
+                    "default": "none",
+                    "fa_icon": "fas fa-check-square",
+                    "hidden": true
                 }
             }
         },

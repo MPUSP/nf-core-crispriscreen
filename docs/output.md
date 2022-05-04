@@ -136,6 +136,8 @@ A custom R script employing [DESeq2](https://bioconductor.org/packages/release/b
 | wmean_fitness        | `numeric` | 1.777574     | weighted mean fitness for gene                          |
 | sd_fitness           | `numeric` | 0.9558989    | standard dev of fitness for gene                        |
 | p_fitness            | `numeric` | 0.001        | p-value from Wilcoxon rank sum test (Null: fitness ~ 0) |
+| p_fitness_adj        | `numeric` | 0.0001       | p-value from Wilcoxon test, Benjamini-Hochberg adjusted |
+| comb_score           | `numeric` | 0.0001       | combined score (`-log10(p-value) * abs(wmean_fitness)`  |
 
 ### R markdown report
 
