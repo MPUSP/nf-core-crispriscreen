@@ -202,9 +202,9 @@ if (normalization) {
         mutate(FoldChange = 2^log2FoldChange) %>%
         group_by(time) %>%
         mutate(
-		    FoldChange_norm = apply_norm(sgRNA, condition, FoldChange),
-		    log2FoldChange = log2(FoldChange_norm)
-	    ) %>% ungroup %>%
+            FoldChange_norm = apply_norm(sgRNA, condition, FoldChange),
+            log2FoldChange = log2(FoldChange_norm)) %>%
+        ungroup %>%
         select(-FoldChange, -FoldChange_norm)
 }
 
