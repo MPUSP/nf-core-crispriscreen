@@ -88,9 +88,6 @@ df_counts %>% group_by(sgRNA) %>%
     dplyr::arrange(dplyr::desc(sgRNAs_detected_in_samples)) %>%
     print
 
-# NORMALIZATION
-# ======================
-#
 # input data frame must be reshaped to a 'counts matrix' with genes as rows
 # and samples (conditions) as columns.
 counts <- df_counts %>%
@@ -100,18 +97,6 @@ counts <- df_counts %>%
     dplyr::mutate_at(vars(-1), function(x) coalesce(x, 0)) %>%
     # add row_names from column
     tibble::column_to_rownames("sgRNA")
-
-# optional normalization using limma
-if (normalization) {
-    message("Performing quantile normalization on per sample read counts.")
-    list_counts <- lapply(unique(df_samplesheet$time), function(time_point) {
-        samples <- row.names(filter(df_samplesheet, time == time_point))
-        limma::normalizeBetweenArrays(as.matrix(counts[samples]), method = "quantile")
-    })
-    counts <- as.data.frame(do.call(cbind, list_counts))
-    counts <- dplyr::mutate(counts, dplyr::across(everything(), ~ round(replace(., . < 0, 0))))
-    counts <- counts[row.names(df_samplesheet)]
-}
 
 # DIFFERENTIAL ABUNDANCE
 # ======================
@@ -189,6 +174,38 @@ DESeq_result_table <- dplyr::select(df_samplesheet, -replicate) %>%
     ) %>%
     dplyr::filter(!is.na(sgRNA))
 
+# NORMALIZATION
+# ======================
+#
+# input data frame must be reshaped to a 'counts matrix' with genes as rows
+# and samples (conditions) as columns.
+# in order to do this, construct a normalization function that takes three
+# colums as input, the numeric variable to be normalized, the conditioning variable
+# (character or factor), and an ID that identifies each observation
+# (barcode/mutant/sgRNA)
+if (normalization) {
+    message("Performing quantile normalization on per sample read counts.")
+
+    apply_norm = function(id, cond, var) {
+        df_orig <- tibble(id = id, cond = cond, var = var)
+        df_new <- pivot_wider(df_orig, names_from = cond, values_from = var) %>%
+        column_to_rownames("id") %>% as.matrix %>%
+        limma::normalizeBetweenArrays(method = "quantile") %>%
+        as_tibble(rownames = "id") %>%
+        pivot_longer(-id, names_to = "cond", values_to = "var_norm")
+        left_join(df_orig, df_new, by = c("id", "cond")) %>% pull(var_norm)
+    }
+
+    # apply normalization
+    DESeq_result_table <- DESeq_result_table %>%
+        mutate(FoldChange = 2^log2FoldChange) %>%
+        group_by(time) %>%
+        mutate(
+		    FoldChange_norm = apply_norm(sgRNA, condition, FoldChange),
+		    log2FoldChange = log2(FoldChange_norm)
+	    ) %>% ungroup %>%
+        select(-FoldChange, -FoldChange_norm)
+}
 
 # CALCULATE FITNESS SCORE
 # =======================
