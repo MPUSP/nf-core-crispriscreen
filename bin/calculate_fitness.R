@@ -19,8 +19,8 @@ path_samplesheet <- args[1]                 # file paths to sample sheet
 path_counts <- args[2]                      # file paths to count tables
 normalization <- as.logical(args[3])        # default: FALSE
 gene_fitness <- as.logical(args[4])         # default: TRUE
-gene_sep <- args[5]                         # default: '|' aka the pipe symbol
-gene_controls <- args[6]                    # default: '' aka empty string
+gene_sep <- args[5]                         # default: "|" aka the pipe symbol
+gene_controls <- args[6]                    # default: "" aka empty string
 number_cores <- as.numeric(args[7])         # number of CPU cores
 
 
@@ -275,12 +275,12 @@ if (n_timepoints > 1 & as.logical(gene_fitness)) {
 if (n_timepoints > 1 & as.logical(gene_fitness)) {
 
     message("Calculating gene fitness and gene log2 fold change.")
-    if (gene_controls != "none") {
+    if (gene_controls != "") {
         df_controls <- DESeq_result_table %>% ungroup %>%
             filter(str_detect(sgRNA_target, gene_controls))
     }
     get_controls <- function(condition) {
-        if (gene_controls != "none") {
+        if (gene_controls != "") {
             filter(df_controls, condition == condition)$fitness
         } else {
             NULL

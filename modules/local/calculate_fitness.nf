@@ -10,7 +10,6 @@ process FITNESS {
     val normalization
     val gene_fitness
     val gene_sep
-    val gene_controls
 
     output:
     path 'all_counts.tsv', emit: allcounts
@@ -19,6 +18,9 @@ process FITNESS {
     path 'versions.yml', emit: versions
 
     script: // This script is bundled with the pipeline, in nf-core/crispriscreen/bin/
+    def args = task.ext.args ?: ''
+    def gene_controls = params.gene_controls > 0 ? '${params.gene_controls}' : ''
+    
     """
     calculate_fitness.R \
         "${samplesheet}" \
@@ -27,8 +29,8 @@ process FITNESS {
         "${gene_fitness}" \
         "${gene_sep}" \
         "${gene_controls}" \
-        $task.cpus
-
+        $task.cpus \
+        $args
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
