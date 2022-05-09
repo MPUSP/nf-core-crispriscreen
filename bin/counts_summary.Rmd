@@ -26,16 +26,22 @@ knitr::opts_chunk$set(echo = FALSE)
 - if not all dependencies are satisfied by R environment, try to install additional libraries `dplyr`, `ggplot2`
 - loading libraries
 
-```{r, echo = FALSE}
+```{r}
+```{r}
 list_req_packages <- c("dplyr", "ggplot2")
 list_to_install <- setdiff(list_req_packages, rownames(installed.packages()))
 
 if (length(list_to_install)) {
-  print(paste0("Missing package(s) ", list_to_install, "are trying to be installed."))
-  pkdir <- paste0(system("echo ${HOME}", intern = TRUE), "/R/pkgs")
-  system(paste0("mkdir ", pkdir))
+  homedir <- grep("/home/", .libPaths(), value = TRUE)
+  if (homedir) {pkdir <- homedir} else {
+    pkdir <- paste0(system("echo ${HOME}", intern = TRUE), "/R/pkgs")
+    system(paste0("mkdir ", pkdir))
+    .libPaths(new = pkdir)
+  }
+  print(paste0("Missing package(s) ", paste(list_to_install, collapse = ", "), " are installed to ", pkdir))
   install.packages(pkgs = list_to_install, lib = pkdir, repos = "https://cloud.r-project.org")
-  .libPaths(new = pkdir)
+} else {
+  print(paste0("Required package(s) ", paste(list_req_packages, collapse = ", "), " are already installed."))
 }
 
 suppressPackageStartupMessages({

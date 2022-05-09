@@ -146,11 +146,11 @@ A custom R script employing [DESeq2](https://bioconductor.org/packages/release/b
 
 - `fitness_report/`
   - `counts_summary.nb.html`: HTML report with information about all samples and read counts.
-  - `fitness_summary.nb.html`: HTML report with information fitness score for all conditions (added soon).
+  - `fitness_summary.nb.html`: HTML report with information about fitness scores for all conditions.
 
 </details>
 
-A custom R markdown template is used to render an HTML report with information about all samples, their number of mapped reads, barcodes, genes, fitness scores, and other information.
+Custom R markdown templates are used to render two HTML reports with information about all samples, their number of mapped reads, barcodes, genes, fitness scores, and other information. If fitness calculation is omitted through the option `gene_fitness = false` in the call to `nextflow run ...`, only the first report is written. The same applies for having less than two time points in the `samplesheet.csv` table.
 
 ### MultiQC
 

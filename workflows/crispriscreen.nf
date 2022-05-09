@@ -180,13 +180,12 @@ workflow CRISPRISCREEN {
         [ [ id:'counts_summary' ], file("$projectDir/bin/counts_summary.Rmd") ],
         [ [ id:'fitness_summary' ], file("$projectDir/bin/fitness_summary.Rmd") ]
     )
-    //ch_fitness = Channel.of(
-    //    [ [ id:'counts_input' ], FITNESS.out.allcounts ],
-    //    [ [ id:'fitness_input' ], FITNESS.out.rdata ]
-    //).collect()
+    ch_fitness = FITNESS.out.allcounts
+    ch_fitness = ch_fitness.mix(FITNESS.out.rdata)
+    ch_fitness = ch_fitness.collect()
 
     RMARKDOWNNOTEBOOK (
-        ch_rmdtemplates, [], FITNESS.out.allcounts
+        ch_rmdtemplates, [], ch_fitness
     )
     ch_versions = ch_versions.mix(RMARKDOWNNOTEBOOK.out.versions)
 
