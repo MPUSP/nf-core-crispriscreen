@@ -176,15 +176,18 @@ workflow CRISPRISCREEN {
     //
     // MODULE: R markdown rendering the final fitness reports
     //
-    ch_rmdtemplate_count = [ [ id:'counts_summary' ], file("$projectDir/bin/counts_summary.Rmd", checkIfExists: true) ]
-    //ch_rmdtemplate_fit = [ [ id:'fitness_summary' ], file("$projectDir/bin/fitness_summary.Rmd", checkIfExists: true) ]
+    ch_rmdtemplates = Channel.of(
+        [ [ id:'counts_summary' ], file("$projectDir/bin/counts_summary.Rmd") ],
+        [ [ id:'fitness_summary' ], file("$projectDir/bin/fitness_summary.Rmd") ]
+    )
+    //ch_fitness = Channel.of(
+    //    [ [ id:'counts_input' ], FITNESS.out.allcounts ],
+    //    [ [ id:'fitness_input' ], FITNESS.out.rdata ]
+    //).collect()
 
     RMARKDOWNNOTEBOOK (
-        ch_rmdtemplate_count, [], FITNESS.out.allcounts
+        ch_rmdtemplates, [], FITNESS.out.allcounts
     )
-    //RMARKDOWNFITNESS (
-    //    ch_rmdtemplate_fit, [], FITNESS.out.rdata
-    //)
     ch_versions = ch_versions.mix(RMARKDOWNNOTEBOOK.out.versions)
 
     //

@@ -17,20 +17,26 @@ output:
     df_print: paged
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, eval = FALSE)
 ```
 
 # Requirements
 
 - loading libraries
 
-```{r, echo = TRUE}
-suppressPackageStartupMessages({
-  library(tidyverse)
-  library(ggrepel)
-  library(scales)
-})
+```{r, echo = TRUE, eval = TRUE}
+sessionInfo()
+wd <- getwd()
+print(list.files(wd))
+figwidth <- 9
+figheight <- 3
+
+# suppressPackageStartupMessages({
+#   library(tidyverse)
+#   library(ggrepel)
+#   library(scales)
+# })
 ```
 
 # Sample overview

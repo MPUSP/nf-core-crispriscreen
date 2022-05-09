@@ -17,19 +17,30 @@ output:
     df_print: paged
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
 # Requirements
 
+- if not all dependencies are satisfied by R environment, try to install additional libraries `dplyr`, `ggplot2`
 - loading libraries
 
-```{r, echo = TRUE}
+```{r, echo = FALSE}
+list_req_packages <- c("dplyr", "ggplot2")
+list_to_install <- setdiff(list_req_packages, rownames(installed.packages()))
+
+if (length(list_to_install)) {
+  print(paste0("Missing package(s) ", list_to_install, "are trying to be installed."))
+  pkdir <- paste0(system("echo ${HOME}", intern = TRUE), "/R/pkgs")
+  system(paste0("mkdir ", pkdir))
+  install.packages(pkgs = list_to_install, lib = pkdir, repos = "https://cloud.r-project.org")
+  .libPaths(new = pkdir)
+}
+
 suppressPackageStartupMessages({
-  library(tidyverse)
-  library(ggrepel)
-  library(scales)
+  library(dplyr)
+  library(ggplot2)
 })
 ```
 
@@ -46,7 +57,7 @@ wd <- getwd()
 # check input files and compile small table
 list_input <- grep(list.files(wd), pattern = "all_counts.tsv", value = TRUE)
 if (length(list_input) == 1) {
-  df_input <- dplyr::bind_cols(
+  df_input <- bind_cols(
     data.frame(list_input),
     file.info(paste(wd, list_input, sep = "/"))
   )
@@ -61,15 +72,17 @@ if (length(list_input) == 1) {
 
 ```{r}
 # load counts matrix
-df_counts <- readr::read_tsv(paste0(wd, "/all_counts.tsv"), col_types = cols())
+df_counts <- read.delim(paste0(wd, "/all_counts.tsv"))
 # rename variables
-df_counts <- dplyr::rename(df_counts, n_reads = numreads) %>%
+df_counts <- rename(df_counts, n_reads = numreads) %>%
   # sort
   arrange(sample)
 print("Import of counts table complete.")
 ```
 
 ## Sample table
+
+- overview of samples
 
 ```{r}
 # list of samples + generic options
@@ -123,11 +136,11 @@ custom_theme <- function(base_size = 12, base_line_size = 1.0, base_rect_size = 
 
 ```{r, fig.width = figwidth, fig.height = figheight}
 df_counts %>%
-  dplyr::group_by(sample) %>% dplyr::summarize(n_reads = sum(n_reads)) %>%
-  ggplot2::ggplot(aes(x = sample, y = n_reads)) +
-  ggplot2::coord_flip() +
-  ggplot2::geom_col(fill = custom_colors[1], alpha = 0.7) +
-  ggplot2::labs(x = "", y = "total number of mapped reads") +
+  group_by(sample) %>% summarize(n_reads = sum(n_reads)) %>%
+  ggplot(aes(x = sample, y = n_reads)) +
+  coord_flip() +
+  geom_col(fill = custom_colors[1], alpha = 0.7) +
+  labs(x = "", y = "total number of mapped reads") +
   custom_theme()
 ```
 
@@ -135,13 +148,13 @@ df_counts %>%
 
 ```{r, fig.width = figwidth, fig.height = figheight}
 df_counts %>%
-  dplyr::group_by(sample) %>%
-  dplyr::summarize(`unique sgRNAs per sample` = sum(n_reads > 0)) %>%
+  group_by(sample) %>%
+  summarize(`unique sgRNAs per sample` = sum(n_reads > 0)) %>%
   # barchart
-  ggplot2::ggplot(aes(x = sample, y = `unique sgRNAs per sample`)) + 
-  ggplot2::geom_col(fill = custom_colors[1], alpha = 0.7) +
-  ggplot2::labs(x = "") +
-  ggplot2::coord_flip() +
+  ggplot(aes(x = sample, y = `unique sgRNAs per sample`)) + 
+  geom_col(fill = custom_colors[1], alpha = 0.7) +
+  labs(x = "") +
+  coord_flip() +
   custom_theme()
 ```
 
@@ -149,10 +162,10 @@ df_counts %>%
 
 ```{r, fig.width = figwidth, fig.height = figheight2, warning = FALSE}
 df_counts %>%
-  ggplot2::ggplot(aes(x = log2(n_reads))) +
-  ggplot2::geom_histogram(fill = custom_colors[1], alpha = 0.7, bins = 30) +
-  ggplot2::labs(y = "", x = expression("log"[2]*" reads per sgRNA")) +
-  ggplot2::facet_wrap(~ sample, ncol = 2) +
+  ggplot(aes(x = log2(n_reads))) +
+  geom_histogram(fill = custom_colors[1], alpha = 0.7, bins = 30) +
+  labs(y = "", x = expression("log"[2]*" reads per sgRNA")) +
+  facet_wrap(~ sample, ncol = 2) +
   custom_theme()
 ```
 
@@ -160,14 +173,14 @@ df_counts %>%
 
 ```{r, fig.width = figwidth, fig.height = figheight2}
 df_counts %>%
-  dplyr::group_by(sample) %>%
-  dplyr::arrange(sample, dplyr::desc(n_reads)) %>% 
-  dplyr::mutate(rank = seq_along(sgRNA)) %>%
-  dplyr::filter(between(rank, 1, 10)) %>%
-  ggplot2::ggplot(aes(x = factor(rank), y = n_reads)) +
-  ggplot2::geom_col(fill = custom_colors[1], alpha = 0.7, width =1) +
-  ggplot2::labs(y = "n reads", x = "sgRNAs ranked by abundance") +
-  ggplot2::facet_wrap(~ sample, ncol = 2) +
+  group_by(sample) %>%
+  arrange(sample, desc(n_reads)) %>% 
+  mutate(rank = seq_along(sgRNA)) %>%
+  filter(between(rank, 1, 10)) %>%
+  ggplot(aes(x = factor(rank), y = n_reads)) +
+  geom_col(fill = custom_colors[1], alpha = 0.7, width =1) +
+  labs(y = "n reads", x = "sgRNAs ranked by abundance") +
+  facet_wrap(~ sample, ncol = 2) +
   custom_theme()
 ```
 
@@ -175,13 +188,13 @@ df_counts %>%
 
 ```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE}
 df_counts %>%
-  dplyr::group_by(sample) %>% dplyr::slice(1:1000) %>%
+  group_by(sample) %>% slice(1:1000) %>%
   # violinplot
-  ggplot2::ggplot(aes(x = sample, y = log10(n_reads))) +
-  ggplot2::geom_violin(trim = FALSE, fill = custom_colors[1],
+  ggplot(aes(x = sample, y = log10(n_reads))) +
+  geom_violin(trim = FALSE, fill = custom_colors[1],
     alpha = 0.7, col = "white") +
-  ggplot2::coord_flip() +
-  ggplot2::stat_summary(fun.data = mean_sdl, geom = "pointrange", size = 0.5, col = grey(0.3)) +
+  coord_flip() +
+  stat_summary(fun.data = mean_sdl, geom = "pointrange", size = 0.5, col = grey(0.3)) +
   custom_theme()
 ```
 
