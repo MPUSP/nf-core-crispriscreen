@@ -31,22 +31,23 @@ list_req_packages <- c("dplyr", "ggplot2")
 list_to_install <- setdiff(list_req_packages, rownames(installed.packages()))
 
 if (length(list_to_install)) {
-  homedir <- grep("/home/", .libPaths(), value = TRUE)
-  if (homedir) {pkdir <- homedir} else {
-    pkdir <- paste0(system("echo ${HOME}", intern = TRUE), "/R/pkgs")
-    system(paste0("mkdir ", pkdir))
-    .libPaths(new = pkdir)
-  }
+  pkdir = .libPaths()[1]
+  install.packages(pkgs = list_to_install, lib = pkdir)
   print(paste0("Missing package(s) ", paste(list_to_install, collapse = ", "), " are installed to ", pkdir))
-  install.packages(pkgs = list_to_install, lib = pkdir, repos = "https://cloud.r-project.org")
 } else {
   print(paste0("Required package(s) ", paste(list_req_packages, collapse = ", "), " are already installed."))
 }
+```
 
+- loading libraries
+
+```{r}
 suppressPackageStartupMessages({
-  library(dplyr)
-  library(ggplot2)
+  for (pkg in list_req_packages) {
+    library(pkg, character.only = TRUE)
+  }
 })
+print(paste0("Required package(s) ", paste(list_req_packages, collapse = ", "), " are loaded."))
 ```
 
 # Sample overview
