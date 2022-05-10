@@ -27,7 +27,6 @@ knitr::opts_chunk$set(echo = FALSE)
 - loading libraries
 
 ```{r}
-```{r}
 list_req_packages <- c("dplyr", "ggplot2")
 list_to_install <- setdiff(list_req_packages, rownames(installed.packages()))
 
@@ -59,18 +58,20 @@ suppressPackageStartupMessages({
 ```{r}
 # get current working directory
 wd <- getwd()
+input_pattern <- "all_counts.tsv"
 
 # check input files and compile small table
-list_input <- grep(list.files(wd), pattern = "all_counts.tsv", value = TRUE)
-if (length(list_input) == 1) {
+input_files <- grep(list.files(wd), pattern = input_pattern, value = TRUE)
+if (length(input_files) == 1) {
   df_input <- bind_cols(
-    data.frame(list_input),
-    file.info(paste(wd, list_input, sep = "/"))
-  )
+    data.frame(input_files),
+    file.info(paste(wd, input_files, sep = "/"))
+  ) %>%
+  mutate(size = paste(size/1e6, "MB"))
   rownames(df_input) <- NULL
-  print(df_input[c(1,2,3,4,5,10)])
+  df_input[c(1,2,3,4,5,10)]
 } else {
-  stop("Required input file 'all_counts.tsv' was not found.")
+  stop(paste0("Required input file(s) '", input_pattern, "' were not found."))
 }
 ```
 
@@ -78,7 +79,7 @@ if (length(list_input) == 1) {
 
 ```{r}
 # load counts matrix
-df_counts <- read.delim(paste0(wd, "/all_counts.tsv"))
+df_counts <- read.delim(paste0(wd, "/", input_pattern))
 # rename variables
 df_counts <- rename(df_counts, n_reads = numreads) %>%
   # sort
@@ -138,7 +139,7 @@ custom_theme <- function(base_size = 12, base_line_size = 1.0, base_rect_size = 
 }
 ```
 
-## QC PLOT: Total number of mapped reads per sample
+## Total number of mapped reads per sample
 
 ```{r, fig.width = figwidth, fig.height = figheight}
 df_counts %>%
@@ -150,32 +151,32 @@ df_counts %>%
   custom_theme()
 ```
 
-## QC PLOT: Number of individual sgRNAs per sample
+## Number of individual barcodes per sample
 
 ```{r, fig.width = figwidth, fig.height = figheight}
 df_counts %>%
   group_by(sample) %>%
-  summarize(`unique sgRNAs per sample` = sum(n_reads > 0)) %>%
+  summarize(`unique barcodes per sample` = sum(n_reads > 0)) %>%
   # barchart
-  ggplot(aes(x = sample, y = `unique sgRNAs per sample`)) + 
+  ggplot(aes(x = sample, y = `unique barcodes per sample`)) + 
   geom_col(fill = custom_colors[1], alpha = 0.7) +
   labs(x = "") +
   coord_flip() +
   custom_theme()
 ```
 
-## QC PLOT: Number of reads per sgRNA, per sample
+## Number of reads per barcode, per sample
 
 ```{r, fig.width = figwidth, fig.height = figheight2, warning = FALSE}
 df_counts %>%
   ggplot(aes(x = log2(n_reads))) +
   geom_histogram(fill = custom_colors[1], alpha = 0.7, bins = 30) +
-  labs(y = "", x = expression("log"[2]*" reads per sgRNA")) +
+  labs(y = "", x = expression("log"[2]*" reads per barcode")) +
   facet_wrap(~ sample, ncol = 2) +
   custom_theme()
 ```
 
-## QC PLOT: Top 10 most abundant sgRNAs, per sample
+## Top 10 most abundant barcodes, per sample
 
 ```{r, fig.width = figwidth, fig.height = figheight2}
 df_counts %>%
@@ -185,12 +186,12 @@ df_counts %>%
   filter(between(rank, 1, 10)) %>%
   ggplot(aes(x = factor(rank), y = n_reads)) +
   geom_col(fill = custom_colors[1], alpha = 0.7, width =1) +
-  labs(y = "n reads", x = "sgRNAs ranked by abundance") +
+  labs(y = "n reads", x = "barcodes ranked by abundance") +
   facet_wrap(~ sample, ncol = 2) +
   custom_theme()
 ```
 
-## QC PLOT: Read count distribution, per sample (max 1000 barcodes)
+## Read count distribution, per sample (max 1000 barcodes)
 
 ```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE}
 df_counts %>%

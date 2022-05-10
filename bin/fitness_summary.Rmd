@@ -27,7 +27,7 @@ knitr::opts_chunk$set(echo = FALSE)
 - loading libraries
 
 ```{r}
-list_req_packages <- c("dplyr", "ggplot2", "gridExtra")
+list_req_packages <- c("dplyr", "ggplot2")
 list_to_install <- setdiff(list_req_packages, rownames(installed.packages()))
 
 if (length(list_to_install)) {
@@ -58,18 +58,20 @@ suppressPackageStartupMessages({
 ```{r}
 # get current working directory
 wd <- getwd()
+input_pattern <- "result.Rdata"
 
 # check input files and compile small table
-list_input <- grep(list.files(wd), pattern = "result.Rdata", value = TRUE)
-if (length(list_input) == 1) {
-  df_input <- dplyr::bind_cols(
-    data.frame(list_input),
-    file.info(paste(wd, list_input, sep = "/"))
-  )
+input_files <- grep(list.files(wd), pattern = input_pattern, value = TRUE)
+if (length(input_files) == 1) {
+  df_input <- bind_cols(
+    data.frame(input_files),
+    file.info(paste(wd, input_files, sep = "/"))
+  ) %>%
+  mutate(size = paste(size/1e6, "MB"))
   rownames(df_input) <- NULL
-  print(df_input[c(1,2,3,4,5,10)])
+  df_input[c(1,2,3,4,5,10)]
 } else {
-  stop("Required input file 'result.Rdata' was not found.")
+  stop(paste0("Required input file(s) '", input_pattern, "' were not found."))
 }
 ```
 
@@ -77,7 +79,7 @@ if (length(list_input) == 1) {
 
 ```{r}
 # load complete fitness data table
-load(paste0(wd, "/result.Rdata"))
+load(paste0(wd, "/", input_pattern))
 print("Import of fitness table complete.")
 ```
 
@@ -87,7 +89,7 @@ print("Import of fitness table complete.")
 # list of samples + generic options
 list_conditions <- unique(DESeq_result_table$condition)
 figwidth <- 9
-figheight <- round(1+(length(list_conditions)))
+figheight <- round(2+(length(list_conditions)))
 
 # output sample table
 DESeq_result_table %>% group_by(condition, time) %>%
@@ -138,7 +140,7 @@ custom_theme <- function(base_size = 12, base_line_size = 1.0, base_rect_size = 
 
 ```{r, fig.width = figwidth, fig.height = 4.5, warning = FALSE}
 plot_sgRNA_correlation <- DESeq_result_table %>%
-  select(sgRNA_target, sgRNA_index, sgRNA_correlation) %>%
+  select(sgRNA_target, sgRNA_index, sgRNA_correlation, condition, time) %>%
   distinct %>%
   # filter indices that have lower frequency than 3%
   group_by(sgRNA_index) %>%
@@ -147,7 +149,7 @@ plot_sgRNA_correlation <- DESeq_result_table %>%
   # plot
   ggplot(aes(x = factor(sgRNA_index), y = sgRNA_correlation)) +
   geom_boxplot(outlier.shape = "") +
-  labs(x = "sgRNA position", y = "correlation") +
+  labs(x = "barcode position", y = "correlation") +
   stat_summary(fun.data = function(x) c(y = median(x)+0.07, 
     label = round(median(x), 2)), geom = "text", size = 3) +
   stat_summary(fun.data = function(x) c(y = 1.1, 
@@ -156,7 +158,7 @@ plot_sgRNA_correlation <- DESeq_result_table %>%
   custom_theme()
 
 plot_sgRNA_correlation_hist <- DESeq_result_table %>%
-  select(sgRNA_target, sgRNA_index, sgRNA_correlation) %>%
+  select(sgRNA_target, sgRNA_index, sgRNA_correlation, condition, time) %>%
   # filter indices that have lower frequency than 3%
   group_by(sgRNA_index) %>%
   mutate(n_obs = n()) %>% ungroup %>%
@@ -171,10 +173,8 @@ plot_sgRNA_correlation_hist <- DESeq_result_table %>%
   geom_histogram(bins = 40, fill = custom_colors[1], alpha = 0.7) +
   custom_theme()
 
-gridExtra::grid.arrange(
-  plot_sgRNA_correlation,
-  plot_sgRNA_correlation_hist,
-  ncol = 2)
+plot_sgRNA_correlation
+plot_sgRNA_correlation_hist
 ```
 
 ## Barcode efficiency
@@ -216,10 +216,8 @@ plot_sgRNA_efficiency_hist <- DESeq_result_table %>%
   geom_smooth(formula = 'y ~ x', method = 'loess') +
   custom_theme()
 
-gridExtra::grid.arrange(
-  plot_sgRNA_efficiency,
-  plot_sgRNA_efficiency_hist,
-  ncol = 2)
+plot_sgRNA_efficiency
+plot_sgRNA_efficiency_hist
 ```
 
 ## Barcode fitness
