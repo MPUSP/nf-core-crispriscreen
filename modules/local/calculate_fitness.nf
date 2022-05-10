@@ -3,6 +3,9 @@ process FITNESS {
     label "process_high"
 
     conda (params.enable_conda ? "conda-forge::r-base=4.0 conda-forge::r-tidyverse bioconda::bioconductor-deseq2=1.28.0 bioconda::bioconductor-biocparallel bioconda::bioconductor-limma" : null)
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/mulled-v2-31ad840d814d356e5f98030a4ee308a16db64ec5:0e852a1e4063fdcbe3f254ac2c7469747a60e361-0' :
+        'rocker/tidyverse' }"
 
     input:
     path samplesheet
@@ -20,7 +23,7 @@ process FITNESS {
     script: // This script is bundled with the pipeline, in nf-core/crispriscreen/bin/
     def args = task.ext.args ?: ''
     def gene_controls = params.gene_controls > 0 ? '${params.gene_controls}' : ''
-    
+
     """
     calculate_fitness.R \
         "${samplesheet}" \
