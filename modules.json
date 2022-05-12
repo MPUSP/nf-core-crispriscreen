@@ -4,7 +4,7 @@
     "repos": {
         "nf-core/modules": {
             "bowtie2/align": {
-                "git_sha": "61f68913fefc20241ceccb671b104230b2d775d7"
+                "git_sha": "c8d3de2ad965bfd8e165f6f6d91249eea3436854"
             },
             "bowtie2/build": {
                 "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
