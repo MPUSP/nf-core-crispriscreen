@@ -11,13 +11,17 @@ process PREPARE_LIBRARY {
     path fasta
 
     output:
-    path '*.saf'       , emit: annotation
-    path "versions.yml", emit: versions
+    path '*.saf'          , emit: annotation
+    path '*_controls.tsv' , emit: controls, optional: true
+    path "versions.yml"   , emit: versions
 
     script: // This script is bundled with the pipeline, in nf-core/crispriscreen/bin/
+    def gene_controls = (params.gene_controls == null) ? '' : params.gene_controls
+
     """
-    prepare_library.R \\
-        $fasta
+    prepare_library.R \
+        $fasta \
+        "${gene_controls}"
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

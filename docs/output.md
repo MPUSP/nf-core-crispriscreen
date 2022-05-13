@@ -67,6 +67,21 @@ Sub-sampling of reads ([Seqtk/sample](https://github.com/lh3/seqtk), optional).
 
 Adapter and quality trimming of reads ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/)).
 
+### Preparation of `*.fasta` library
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `prepare/`
+  - `*.saf`: The input library in `saf` format converted from the provided `.fasta` file.
+  - `*_controls.tsv`: _Optional_ table in tab-separated format with overview of control barcodes.
+
+</details>
+
+This module generates a `.tsv` input table from the provided `.fasta` file.
+It also checks if a pattern for control barcodes has been passed with the `--gene_controls` parameter.
+In case a pattern has been supplied but no matching barcodes were found, it stops with an error.
+
 ### Bowtie2
 
 <details markdown="1">

@@ -11,9 +11,10 @@
 # Author: Michael Jahn, PhD
 # Affilation: Science For Life Laboratory (KTH), Stockholm, Sweden
 
-# input parameter: path to fasta file
+# input parameters
 args <- commandArgs(trailingOnly = TRUE)
-fasta_file <- args[1]
+fasta_file <- args[1]             # path to fasta file, mandatory
+gene_controls <- args[2]          # pattern for control barcodes, default: "" aka empty string
 
 # read and process fasta file
 fasta_df <- read.delim(fasta_file, header = FALSE)
@@ -37,3 +38,13 @@ saf_df <- saf_df[c("GeneID", "Chr", "Start", "End", "Strand", "Sequence")]
 saf_name <- gsub("fasta$", "saf", basename(fasta_file))
 write.table(x = saf_df, file = saf_name, sep = "\t", row.names = FALSE,
     col.names = FALSE, quote = FALSE)
+
+# optionally identify controls and save them for reference
+if (gene_controls != "") {
+    ctrl_hits <- grepl(gene_controls, saf_df$GeneID)
+    if (!sum(ctrl_hits)) {stop(paste0("No barcode name matches supplied pattern '", gene_controls, "'."))}
+    saf_df_ctrl <- subset(saf_df, ctrl_hits)
+    ctrl_name <- gsub(".fasta$", "_controls.tsv", basename(fasta_file))
+    write.table(x = saf_df_ctrl, file = ctrl_name, sep = "\t", row.names = FALSE,
+        col.names = FALSE, quote = FALSE)
+}
