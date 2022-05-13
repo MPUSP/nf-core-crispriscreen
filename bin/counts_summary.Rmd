@@ -31,9 +31,11 @@ list_req_packages <- c("dplyr", "ggplot2")
 list_to_install <- setdiff(list_req_packages, rownames(installed.packages()))
 
 if (length(list_to_install)) {
-  pkdir = .libPaths()[1]
+  pkdir <- paste0(system("echo ${HOME}", intern = TRUE), "/.R")
+  system(paste0("mkdir ", pkdir))
+  .libPaths(new = pkdir)
   install.packages(pkgs = list_to_install, lib = pkdir)
-  print(paste0("Missing package(s) ", paste(list_to_install, collapse = ", "), " are installed to ", pkdir))
+  print(paste0("Missing package(s) ", paste(list_to_install, collapse = ", "), " are installed to '", pkdir, "'."))
 } else {
   print(paste0("Required package(s) ", paste(list_req_packages, collapse = ", "), " are already installed."))
 }

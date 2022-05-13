@@ -27,11 +27,17 @@ number_cores <- as.numeric(args[7])         # number of CPU cores
 # LOAD PACKAGES
 # ====================
 #
+# add library dir for additional packages
+pkdir <- paste0(system("echo ${HOME}", intern = TRUE), "/.R")
+system(paste0("mkdir ", pkdir))
+.libPaths(new = pkdir)
+
 # generic R packages
 list_req_packages <- c("readr", "dplyr", "tibble", "stringr", "tidyr", "purrr")
 list_to_install <- setdiff(list_req_packages, rownames(installed.packages()))
 if (length(list_to_install)) {
-    install.packages(pkgs = list_to_install, lib = .libPaths()[1])
+    message(paste0("Missing package(s) ", paste(list_to_install, collapse = ", "), " are installed to '", pkdir, "'."))
+    install.packages(pkgs = list_to_install, lib = pkdir)
 }
 
 library(readr)
@@ -49,8 +55,9 @@ if (normalization) {
 
 list_to_install <- setdiff(list_bioc_packages, rownames(installed.packages()))
 if (length(list_to_install)) {
-    install.packages(pkgs = "BiocManager", lib = .libPaths()[1])
-    BiocManager::install(pkgs = list_to_install, lib = .libPaths()[1],
+    message(paste0("Missing package(s) ", paste(list_to_install, collapse = ", "), " are installed to '", pkdir, "'."))
+    install.packages(pkgs = "BiocManager", lib = pkdir)
+    BiocManager::install(pkgs = list_to_install, lib = pkdir,
         update = FALSE, ask = FALSE)
 }
 
