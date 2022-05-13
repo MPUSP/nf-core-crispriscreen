@@ -22,7 +22,7 @@ process FITNESS {
 
     script: // This script is bundled with the pipeline, in nf-core/crispriscreen/bin/
     def args = task.ext.args ?: ''
-    def gene_controls = params.gene_controls > 0 ? '${params.gene_controls}' : ''
+    def gene_controls = (params.gene_controls == null) ? '' : params.gene_controls
 
     """
     calculate_fitness.R \
