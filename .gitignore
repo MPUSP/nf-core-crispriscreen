@@ -4,7 +4,6 @@ data/
 results/
 .DS_Store
 testing/
-testing*
 *.pyc
 *.Rproj.user
 *.Rproj

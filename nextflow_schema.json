@@ -343,6 +343,13 @@
                     "fa_icon": "fas fa-check-square",
                     "hidden": true
                 },
+                "sort_bam": {
+                    "type": "boolean",
+                    "description": "Whether to use samtools sort (true) or samtools view (false)",
+                    "default": true,
+                    "fa_icon": "fas fa-check-square",
+                    "hidden": true
+                },
                 "validate_params": {
                     "type": "boolean",
                     "description": "Boolean whether to validate parameters against the schema at runtime.",
