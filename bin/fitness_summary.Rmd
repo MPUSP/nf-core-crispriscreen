@@ -30,9 +30,16 @@ list_req_packages <- c("dplyr", "ggplot2", "gridExtra")
 list_to_install <- setdiff(list_req_packages, rownames(installed.packages()))
 
 if (length(list_to_install)) {
-  pkdir <- paste0(system("echo ${HOME}", intern = TRUE), "/.R")
-  system(paste0("mkdir ", pkdir))
-  .libPaths(new = pkdir)
+  # add library dir for additional packages
+  homedir <- system("echo ${HOME}", intern = TRUE)
+  libdir <- .libPaths()
+  if (any(grepl(homedir, libdir))) {
+      pkdir <- grep(homedir, libdir, value = TRUE)
+  } else {
+      pkdir <- paste0(homedir, "/.R")
+      system(paste0("mkdir ", pkdir))
+      .libPaths(new = pkdir)
+  }
   install.packages(pkgs = list_to_install, lib = pkdir)
   print(paste0("Missing package(s) ", paste(list_to_install, collapse = ", "), " are installed to '", pkdir, "'."))
 } else {
@@ -72,14 +79,19 @@ if (length(input_files) == 1) {
   mutate(size = paste(size/1e6, "MB"))
   rownames(df_input) <- NULL
   df_input[c(1,2,3,4,5,10)]
+  eval_chunks <- TRUE
 } else {
-  stop(paste0("Required input file(s) '", input_pattern, "' were not found."))
+  print(paste0("Required input file(s) '", input_pattern, "' were not found."))
+  print("Further processing of the analysis is omitted.")
+  eval_chunks <- FALSE
+  figwidth <- 6
+  figheight <- 6
 }
 ```
 
 - Importing result tables:
 
-```{r}
+```{r, eval = eval_chunks}
 # load complete fitness data table
 load(paste0(wd, "/", input_pattern))
 print("Import of fitness table complete.")
@@ -87,7 +99,7 @@ print("Import of fitness table complete.")
 
 ## Conditions table
 
-```{r}
+```{r, eval = eval_chunks}
 # list of samples + generic options
 list_conditions <- unique(DESeq_result_table$condition)
 figwidth <- 9
@@ -103,7 +115,7 @@ DESeq_result_table %>% group_by(condition, time) %>%
 ```
 
 
-```{r}
+```{r, eval = eval_chunks}
 # define a custom ggplot2 theme (just for prettiness)
 # custom ggplot2 theme that is reused for all later plots
 custom_colors = c("#E7298A", "#66A61E", "#E6AB02", "#7570B3", "#B3B3B3", "#1B9E77", "#D95F02", "#A6761D")
@@ -140,7 +152,7 @@ custom_theme <- function(base_size = 12, base_line_size = 1.0, base_rect_size = 
 - correlation is broken down by position/index of the barcode
 - this representation can reveal if certain positions (i.e. distant from TSS) are biased
 
-```{r, fig.width = figwidth, fig.height = 4.5, warning = FALSE}
+```{r, fig.width = figwidth, fig.height = 4.5, warning = FALSE, eval = eval_chunks}
 plot_sgRNA_correlation <- DESeq_result_table %>%
   select(sgRNA_target, sgRNA_index, sgRNA_correlation, condition, time) %>%
   distinct %>%
@@ -186,7 +198,7 @@ plot_sgRNA_correlation_hist
 - correlation is broken down by position/index of the barcode
 - this representation can reveal if certain positions (i.e. distant from TSS) are less effective in causing a fitness effect
 
-```{r, fig.width = figwidth, fig.height = 4.5, warning = FALSE}
+```{r, fig.width = figwidth, fig.height = 4.5, warning = FALSE, eval = eval_chunks}
 plot_sgRNA_efficiency <- DESeq_result_table %>%
   # filter indices that have lower frequency than 3%
   group_by(sgRNA_index) %>%
@@ -230,7 +242,7 @@ plot_sgRNA_efficiency_hist
 - A _positive_ fitness score means enrichment of the respective barcode, _negative_ fitness means depletion
 - This information is useful to show global differences between conditions, e.g. stronger vs weaker selection
 
-```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE}
+```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE, eval = eval_chunks}
 DESeq_result_table %>%
   filter(time == 0) %>%
   group_by(condition, sgRNA) %>%
@@ -248,7 +260,7 @@ DESeq_result_table %>%
 - Metric is the weighted mean fitness of all barcodes
 - This information is useful to show global differences between conditions, e.g. stronger vs weaker selection
 
-```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE}
+```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE, eval = eval_chunks}
 DESeq_result_table %>%
   filter(time == 0) %>%
   group_by(condition, sgRNA_target) %>%

@@ -16,8 +16,8 @@ process FITNESS {
 
     output:
     path 'all_counts.tsv', emit: allcounts
-    path 'result.Rdata', emit: rdata
-    path 'result.tsv', emit: tsv
+    path 'result.Rdata', emit: rdata, optional:true
+    path 'result.tsv', emit: tsv, optional:true
     path 'versions.yml', emit: versions
 
     script: // This script is bundled with the pipeline, in nf-core/crispriscreen/bin/
