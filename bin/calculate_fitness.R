@@ -84,9 +84,9 @@ stopifnot(is.numeric(df_samplesheet$time))
 # Check that at least one condition has more than one time point,
 # otherwise skip DESeq2 and fitness calculation
 n_timepoints <- df_samplesheet %>%
-  dplyr::group_by(condition) %>%
-  dplyr::summarize(t_unique = length(unique(time))) %>%
-  pull(t_unique) %>% max
+    dplyr::group_by(condition) %>%
+    dplyr::summarize(t_unique = length(unique(time))) %>%
+    pull(t_unique) %>% max
 
 df_counts <- list.files(path = getwd(), full.names = TRUE, pattern = ".featureCounts.txt$") %>%
     lapply(function(x) {
@@ -127,12 +127,12 @@ counts <- df_counts %>%
 # (https://doi.org/10.1186/s13059-014-0550-8)
 
 if (n_timepoints <= 1) {
-  message("No condition has more than one time point.\nA DESeq2 comparison of condition ~ 1 is chosen.")
+    message("No condition has more than one time point.\nFitness score calculation is omitted")
 } else {
 
     message("Running DESeq2 for pairwise comparison.\nNote: this step can be time and computation-intense.")
     message(paste0("Number of CPU cores used for DESeq parallel execution: ", number_cores, "."))
-    
+
     # 2. Meta data
     # Meta data is required to carry out the actual DESeq2 analysis
     # by 'contrasting' (comparing) selected conditions to each other.
@@ -140,14 +140,14 @@ if (n_timepoints <= 1) {
     if (!all(colnames(counts) == row.names(df_samplesheet))) {
         counts <- counts[row.names(df_samplesheet)]
     }
-    
+
     # 3. Perform DESeq2 analysis
     DESeq_result <- DESeqDataSetFromMatrix(
         countData = counts,
         colData = df_samplesheet,
         design = ~ group) %>%
         DESeq
-    
+
     # The syntax to call DESeq2's `results(...)` function is to use one pair of
     # contrasts `contrast("variable", "level1", "level2")`. To automate this,
     # a list of condition and reference pairs is set up from meta data
@@ -156,7 +156,7 @@ if (n_timepoints <= 1) {
         dplyr::filter(group != reference_group) %>%
         dplyr::mutate(across(.cols = everything(), .fns = as.character)) %>%
         dplyr::distinct() %>% as.list %>% purrr::transpose()
-    
+
     # extract results for desired combinations
     DESeq_result_table <- lapply(combinations, function(l) {
         DESeq2::results(DESeq_result,
@@ -166,7 +166,7 @@ if (n_timepoints <= 1) {
             tibble::as_tibble() %>% dplyr::mutate(group = l$group) %>%
             dplyr::rename(sgRNA = row)
         }) %>% dplyr::bind_rows()
-    
+
     # MERGE DESEQ RESULTS
     # ======================
     #
@@ -182,7 +182,7 @@ if (n_timepoints <= 1) {
             dplyr::filter(is.na(group), time == 0)
         )
     }
-    
+
     # merge DESeq result table with meta data
     DESeq_result_table <- dplyr::select(df_samplesheet, -replicate) %>%
         dplyr::distinct() %>% tibble::as_tibble() %>%
@@ -198,7 +198,7 @@ if (n_timepoints <= 1) {
             padj = replace_na(padj, 1)
         ) %>%
         dplyr::filter(!is.na(sgRNA))
-    
+
     # NORMALIZATION
     # ======================
     #
@@ -210,7 +210,7 @@ if (n_timepoints <= 1) {
     # (barcode/mutant/sgRNA)
     if (normalization) {
         message("Performing quantile normalization on per sample read counts.")
-    
+
         apply_norm = function(id, cond, var) {
             df_orig <- tibble(id = id, cond = cond, var = var)
             df_new <- pivot_wider(df_orig, names_from = cond, values_from = var) %>%
@@ -220,7 +220,7 @@ if (n_timepoints <= 1) {
             pivot_longer(-id, names_to = "cond", values_to = "var_norm")
             left_join(df_orig, df_new, by = c("id", "cond")) %>% pull(var_norm)
         }
-    
+
         # apply normalization
         DESeq_result_table <- DESeq_result_table %>%
             mutate(FoldChange = 2^log2FoldChange) %>%
@@ -231,7 +231,7 @@ if (n_timepoints <= 1) {
             ungroup %>%
             select(-FoldChange, -FoldChange_norm)
     }
-    
+
     # CALCULATE FITNESS SCORE
     # =======================
     #
@@ -246,8 +246,8 @@ if (n_timepoints <= 1) {
         dplyr::arrange(sgRNA, condition, time) %>%
         dplyr::group_by(sgRNA, condition) %>%
         dplyr::mutate(fitness = calc_auc(time, log2FoldChange)/(max(time)/2))
-    
-    
+
+
     # CALCULATE SGRNA CORRELATION AND EFFICIENCY
     # ==========================================
     #
@@ -258,7 +258,7 @@ if (n_timepoints <= 1) {
     # B) sgRNA efficiency = median absolute fitness of an sgRNA over all observations [conditions],
     #        divided by maximum fitness of an sgRNA. A score between 0 and 1.
     if (as.logical(gene_fitness)) {
-    
+
         message("Calculating sgRNA efficiency and correlation.")
         determine_corr <- function(index, value, condition, time) {
             # make correlation matrix
@@ -276,7 +276,7 @@ if (n_timepoints <= 1) {
             # as sgRNA index vector
             dplyr::left_join(df, weights, by = "index") %>% pull(weight)
         }
-    
+
         DESeq_result_table <- DESeq_result_table %>%
             # split sgRNA names into target gene and position
             tidyr::separate(sgRNA, into = c("sgRNA_target", "sgRNA_position"), sep = paste0("\\", gene_sep),
@@ -288,7 +288,7 @@ if (n_timepoints <= 1) {
                 sgRNA_correlation = determine_corr(sgRNA_index, log2FoldChange, condition, time),
                 sgRNA_efficiency = ave(fitness, sgRNA_position, FUN = function(x) median(abs(x))) %>%
                 {./max(.)})
-    
+
     # SUMMARIZE SGRNA FITNESS TO GENE FITNESS
     # =======================================
     #
@@ -306,7 +306,7 @@ if (n_timepoints <= 1) {
                 NULL
             }
         }
-    
+
         DESeq_result_table <- dplyr::left_join(
             DESeq_result_table,
             DESeq_result_table %>%
