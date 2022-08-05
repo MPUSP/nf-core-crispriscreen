@@ -34,11 +34,11 @@ if (length(list_to_install)) {
   homedir <- system("echo ${HOME}", intern = TRUE)
   libdir <- .libPaths()
   if (any(grepl(homedir, libdir))) {
-      pkdir <- grep(homedir, libdir, value = TRUE)
+    pkdir <- grep(homedir, libdir, value = TRUE)
   } else {
-      pkdir <- paste0(homedir, "/.R")
-      system(paste0("mkdir ", pkdir))
-      .libPaths(new = pkdir)
+    pkdir <- paste0(homedir, "/.R")
+    system(paste0("mkdir ", pkdir))
+    .libPaths(new = pkdir)
   }
   install.packages(pkgs = list_to_install, lib = pkdir)
   print(paste0("Missing package(s) ", paste(list_to_install, collapse = ", "), " are installed to '", pkdir, "'."))
@@ -76,9 +76,9 @@ if (length(input_files) == 1) {
     data.frame(input_files),
     file.info(paste(wd, input_files, sep = "/"))
   ) %>%
-  mutate(size = paste(size/1e6, "MB"))
+    mutate(size = paste(size / 1e6, "MB"))
   rownames(df_input) <- NULL
-  df_input[c(1,2,3,4,5,10)]
+  df_input[c(1, 2, 3, 4, 5, 10)]
   eval_chunks <- TRUE
 } else {
   print(paste0("Required input file(s) '", input_pattern, "' were not found."))
@@ -103,11 +103,13 @@ print("Import of fitness table complete.")
 # list of samples + generic options
 list_conditions <- unique(DESeq_result_table$condition)
 figwidth <- 9
-figheight <- round(2+(length(list_conditions)))
+figheight <- round(2 + (length(list_conditions)))
 
 # output sample table
-DESeq_result_table %>% group_by(condition, time) %>%
-  summarize(.groups = "drop",
+DESeq_result_table %>%
+  group_by(condition, time) %>%
+  summarize(
+    .groups = "drop",
     barcodes = length(unique(sgRNA)),
     DESeq_baseMean = mean(baseMean, na.rm = TRUE),
     DESeq_log2FC = mean(log2FoldChange, na.rm = TRUE),
@@ -118,13 +120,15 @@ DESeq_result_table %>% group_by(condition, time) %>%
 ```{r, eval = eval_chunks}
 # define a custom ggplot2 theme (just for prettiness)
 # custom ggplot2 theme that is reused for all later plots
-custom_colors = c("#E7298A", "#66A61E", "#E6AB02", "#7570B3", "#B3B3B3", "#1B9E77", "#D95F02", "#A6761D")
-custom_range <- function(n = 5) {colorRampPalette(custom_colors[c(1,5,2)])(n)}
+custom_colors <- c("#E7298A", "#66A61E", "#E6AB02", "#7570B3", "#B3B3B3", "#1B9E77", "#D95F02", "#A6761D")
+custom_range <- function(n = 5) {
+  colorRampPalette(custom_colors[c(1, 5, 2)])(n)
+}
 
 custom_theme <- function(base_size = 12, base_line_size = 1.0, base_rect_size = 1.0, ...) {
   theme_light(base_size = base_size, base_line_size = base_line_size, base_rect_size = base_rect_size) + theme(
     title = element_text(colour = grey(0.4), size = 10),
-    plot.margin = unit(c(12,12,12,12), "points"),
+    plot.margin = unit(c(12, 12, 12, 12), "points"),
     axis.ticks.length = unit(0.2, "cm"),
     axis.ticks = element_line(colour = grey(0.4), linetype = "solid", lineend = "round"),
     axis.text.x = element_text(colour = grey(0.4), size = 10),
@@ -134,7 +138,7 @@ custom_theme <- function(base_size = 12, base_line_size = 1.0, base_rect_size = 
     panel.border = element_rect(linetype = "solid", colour = grey(0.4), fill = NA, size = 1.0),
     panel.background = element_blank(),
     strip.background = element_blank(),
-    strip.text = element_text(colour = grey(0.4), size = 10, margin = unit(rep(3,4), "points")),
+    strip.text = element_text(colour = grey(0.4), size = 10, margin = unit(rep(3, 4), "points")),
     legend.text = element_text(colour = grey(0.4), size = 10),
     legend.title = element_blank(),
     legend.background = element_blank(),
@@ -155,19 +159,28 @@ custom_theme <- function(base_size = 12, base_line_size = 1.0, base_rect_size = 
 ```{r, fig.width = figwidth, fig.height = 4.5, warning = FALSE, eval = eval_chunks}
 plot_sgRNA_correlation <- DESeq_result_table %>%
   select(sgRNA_target, sgRNA_index, sgRNA_correlation, condition, time) %>%
-  distinct %>%
+  distinct() %>%
   # filter indices that have lower frequency than 3%
   group_by(sgRNA_index) %>%
-  mutate(n_obs = n()) %>% ungroup %>%
-  filter(n_obs >= n()*0.03) %>%
+  mutate(n_obs = n()) %>%
+  ungroup() %>%
+  filter(n_obs >= n() * 0.03) %>%
   # plot
   ggplot(aes(x = factor(sgRNA_index), y = sgRNA_correlation)) +
   geom_boxplot(outlier.shape = "") +
   labs(x = "barcode position", y = "correlation") +
-  stat_summary(fun.data = function(x) c(y = median(x)+0.07, 
-    label = round(median(x), 2)), geom = "text", size = 3) +
-  stat_summary(fun.data = function(x) c(y = 1.1, 
-    label = length(x)), geom = "text", color = grey(0.5), size = 3) +
+  stat_summary(fun.data = function(x) {
+    c(
+      y = median(x) + 0.07,
+      label = round(median(x), 2)
+    )
+  }, geom = "text", size = 3) +
+  stat_summary(fun.data = function(x) {
+    c(
+      y = 1.1,
+      label = length(x)
+    )
+  }, geom = "text", color = grey(0.5), size = 3) +
   coord_cartesian(ylim = c(-0.15, 1.15)) +
   custom_theme()
 
@@ -175,9 +188,11 @@ plot_sgRNA_correlation_hist <- DESeq_result_table %>%
   select(sgRNA_target, sgRNA_index, sgRNA_correlation, condition, time) %>%
   # filter indices that have lower frequency than 3%
   group_by(sgRNA_index) %>%
-  mutate(n_obs = n()) %>% ungroup %>%
-  filter(n_obs >= n()*0.03) %>%
-  distinct %>% group_by(sgRNA_target) %>%
+  mutate(n_obs = n()) %>%
+  ungroup() %>%
+  filter(n_obs >= n() * 0.03) %>%
+  distinct() %>%
+  group_by(sgRNA_target) %>%
   summarize(
     median_sgRNA_correlation = median(sgRNA_correlation),
     min_sgRNA_correlation = min(sgRNA_correlation)
@@ -202,32 +217,44 @@ plot_sgRNA_correlation_hist
 plot_sgRNA_efficiency <- DESeq_result_table %>%
   # filter indices that have lower frequency than 3%
   group_by(sgRNA_index) %>%
-  mutate(n_obs = n()) %>% ungroup %>%
-  filter(n_obs >= n()*0.03) %>%
-  select(sgRNA_target, sgRNA_index, sgRNA_efficiency) %>% distinct %>%
+  mutate(n_obs = n()) %>%
+  ungroup() %>%
+  filter(n_obs >= n() * 0.03) %>%
+  select(sgRNA_target, sgRNA_index, sgRNA_efficiency) %>%
+  distinct() %>%
   ggplot(aes(x = factor(sgRNA_index), y = sgRNA_efficiency)) +
   geom_boxplot(notch = FALSE, outlier.shape = ".") +
   labs(x = "sgRNA position (relative)", y = "repression efficiency") +
   coord_cartesian(ylim = c(-0.15, 1.15)) +
-  stat_summary(fun.data = function(x) c(y = median(x)+0.07, 
-    label = round(median(x), 2)), geom = "text", size = 3) +
-  stat_summary(fun.data = function(x) c(y = 1.1, 
-    label = length(x)), geom = "text", color = grey(0.5), size = 3) +
+  stat_summary(fun.data = function(x) {
+    c(
+      y = median(x) + 0.07,
+      label = round(median(x), 2)
+    )
+  }, geom = "text", size = 3) +
+  stat_summary(fun.data = function(x) {
+    c(
+      y = 1.1,
+      label = length(x)
+    )
+  }, geom = "text", color = grey(0.5), size = 3) +
   custom_theme()
 
 plot_sgRNA_efficiency_hist <- DESeq_result_table %>%
   # filter indices that have lower frequency than 3%
   group_by(sgRNA_index) %>%
-  mutate(n_obs = n()) %>% ungroup %>%
-  filter(n_obs >= n()*0.03) %>%
-  select(sgRNA_target, sgRNA_position, sgRNA_efficiency) %>% distinct %>%
+  mutate(n_obs = n()) %>%
+  ungroup() %>%
+  filter(n_obs >= n() * 0.03) %>%
+  select(sgRNA_target, sgRNA_position, sgRNA_efficiency) %>%
+  distinct() %>%
   group_by(sgRNA_position) %>%
   summarize(sgRNA_efficiency = median(sgRNA_efficiency), n_pos = n()) %>%
   filter(n_pos >= 10) %>%
   ggplot(aes(x = sgRNA_position, y = sgRNA_efficiency)) +
   labs(x = "sgRNA position (nt)", y = "repression efficiency") +
   geom_point(col = alpha(custom_colors[5], 0.5)) +
-  geom_smooth(formula = 'y ~ x', method = 'loess') +
+  geom_smooth(formula = "y ~ x", method = "loess") +
   custom_theme()
 
 plot_sgRNA_efficiency
@@ -249,7 +276,7 @@ DESeq_result_table %>%
   summarize(fitness = unique(fitness), .groups = "drop") %>%
   ggplot(aes(x = fitness)) +
   geom_histogram(bins = 100) +
-  facet_wrap( ~ condition) +
+  facet_wrap(~condition) +
   custom_theme()
 ```
 
@@ -267,7 +294,7 @@ DESeq_result_table %>%
   summarize(wmean_fitness = unique(wmean_fitness), .groups = "drop") %>%
   ggplot(aes(x = wmean_fitness)) +
   geom_histogram(bins = 100) +
-  facet_wrap( ~ condition) +
+  facet_wrap(~condition) +
   custom_theme()
 ```
 

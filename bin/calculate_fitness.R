@@ -15,13 +15,13 @@
 #
 # input arguments
 args <- commandArgs(trailingOnly = TRUE)
-path_samplesheet <- args[1]                 # file paths to sample sheet
-path_counts <- args[2]                      # file paths to count tables
-normalization <- as.logical(args[3])        # default: FALSE
-gene_fitness <- as.logical(args[4])         # default: TRUE
-gene_sep <- args[5]                         # default: "|" aka the pipe symbol
-gene_controls <- args[6]                    # default: "" aka empty string
-number_cores <- as.numeric(args[7])         # number of CPU cores
+path_samplesheet <- args[1] # file paths to sample sheet
+path_counts <- args[2] # file paths to count tables
+normalization <- as.logical(args[3]) # default: FALSE
+gene_fitness <- as.logical(args[4]) # default: TRUE
+gene_sep <- args[5] # default: "|" aka the pipe symbol
+gene_controls <- args[6] # default: "" aka empty string
+number_cores <- as.numeric(args[7]) # number of CPU cores
 
 
 # LOAD PACKAGES
@@ -63,20 +63,24 @@ list_to_install <- setdiff(list_bioc_packages, rownames(installed.packages()))
 if (length(list_to_install)) {
     message(paste0("Missing package(s) ", paste(list_to_install, collapse = ", "), " are installed to '", pkdir, "'."))
     install.packages(pkgs = "BiocManager", lib = pkdir)
-    BiocManager::install(pkgs = list_to_install, lib = pkdir,
-        update = FALSE, ask = FALSE)
+    BiocManager::install(
+        pkgs = list_to_install, lib = pkdir,
+        update = FALSE, ask = FALSE
+    )
 }
 
 library(DESeq2)
 library(BiocParallel)
-if (normalization) {library(limma)}
+if (normalization) {
+    library(limma)
+}
 
 # DATA PREPARATION
 # ====================
 #
 # Step 1: Load sample layout sheet - file names must be row names
 df_samplesheet <- readr::read_csv(path_samplesheet, col_types = cols()) %>%
-    select(all_of(c("sample", "condition", "replicate", "date", "time", "group","reference_group"))) %>%
+    select(all_of(c("sample", "condition", "replicate", "date", "time", "group", "reference_group"))) %>%
     dplyr::mutate(group = factor(`group`)) %>%
     tibble::column_to_rownames("sample")
 stopifnot(is.numeric(df_samplesheet$time))
@@ -86,27 +90,32 @@ stopifnot(is.numeric(df_samplesheet$time))
 n_timepoints <- df_samplesheet %>%
     dplyr::group_by(condition) %>%
     dplyr::summarize(t_unique = length(unique(time))) %>%
-    pull(t_unique) %>% max
+    pull(t_unique) %>%
+    max()
 
 df_counts <- list.files(path = getwd(), full.names = TRUE, pattern = ".featureCounts.txt$") %>%
     lapply(function(x) {
         df <- readr::read_tsv(x, col_types = cols(), skip = 1)
-        df <- tidyr::pivot_longer(df, cols = matches("*.\\.bam$"),
-            names_to = "sample", values_to = "numreads")
+        df <- tidyr::pivot_longer(df,
+            cols = matches("*.\\.bam$"),
+            names_to = "sample", values_to = "numreads"
+        )
         df <- dplyr::mutate(df, sample = stringr::str_remove(sample, "\\.bam$"))
-        df }) %>%
+        df
+    }) %>%
     dplyr::bind_rows() %>%
     dplyr::rename(sgRNA = Geneid) %>%
     dplyr::select(sample, sgRNA, numreads)
 
 # print overview information to console
 message("Number of sgRNAs detected in n samples:")
-df_counts %>% group_by(sgRNA) %>%
+df_counts %>%
+    group_by(sgRNA) %>%
     dplyr::summarize(sgRNAs_detected_in_samples = sum(numreads > 0)) %>%
     dplyr::count(sgRNAs_detected_in_samples) %>%
-    dplyr::mutate(percent_total = n/sum(n)*100) %>%
+    dplyr::mutate(percent_total = n / sum(n) * 100) %>%
     dplyr::arrange(dplyr::desc(sgRNAs_detected_in_samples)) %>%
-    print
+    print()
 
 # input data frame must be reshaped to a 'counts matrix' with genes as rows
 # and samples (conditions) as columns.
@@ -129,7 +138,6 @@ counts <- df_counts %>%
 if (n_timepoints <= 1) {
     message("No condition has more than one time point.\nFitness score calculation is omitted")
 } else {
-
     message("Running DESeq2 for pairwise comparison.\nNote: this step can be time and computation-intense.")
     message(paste0("Number of CPU cores used for DESeq parallel execution: ", number_cores, "."))
 
@@ -145,8 +153,9 @@ if (n_timepoints <= 1) {
     DESeq_result <- DESeqDataSetFromMatrix(
         countData = counts,
         colData = df_samplesheet,
-        design = ~ group) %>%
-        DESeq
+        design = ~group
+    ) %>%
+        DESeq()
 
     # The syntax to call DESeq2's `results(...)` function is to use one pair of
     # contrasts `contrast("variable", "level1", "level2")`. To automate this,
@@ -155,17 +164,21 @@ if (n_timepoints <= 1) {
         dplyr::select(group, reference_group) %>%
         dplyr::filter(group != reference_group) %>%
         dplyr::mutate(across(.cols = everything(), .fns = as.character)) %>%
-        dplyr::distinct() %>% as.list %>% purrr::transpose()
+        dplyr::distinct() %>%
+        as.list() %>%
+        purrr::transpose()
 
     # extract results for desired combinations
     DESeq_result_table <- lapply(combinations, function(l) {
         DESeq2::results(DESeq_result,
             contrast = c("group", l$group, l$reference_group),
             parallel = TRUE, BPPARAM = MulticoreParam(number_cores),
-            tidy = TRUE) %>%
-            tibble::as_tibble() %>% dplyr::mutate(group = l$group) %>%
+            tidy = TRUE
+        ) %>%
+            tibble::as_tibble() %>%
+            dplyr::mutate(group = l$group) %>%
             dplyr::rename(sgRNA = row)
-        }) %>% dplyr::bind_rows()
+    }) %>% dplyr::bind_rows()
 
     # MERGE DESEQ RESULTS
     # ======================
@@ -179,13 +192,14 @@ if (n_timepoints <= 1) {
         df_samplesheet <- dplyr::bind_rows(
             df_samplesheet,
             df_samplesheet %>% tidyr::complete(condition, tidyr::nesting(date, time)) %>%
-            dplyr::filter(is.na(group), time == 0)
+                dplyr::filter(is.na(group), time == 0)
         )
     }
 
     # merge DESeq result table with meta data
     DESeq_result_table <- dplyr::select(df_samplesheet, -replicate) %>%
-        dplyr::distinct() %>% tibble::as_tibble() %>%
+        dplyr::distinct() %>%
+        tibble::as_tibble() %>%
         dplyr::full_join(DESeq_result_table, by = "group") %>%
         dplyr::mutate(group = as.numeric(group)) %>%
         # complete missing combinations of variables, here mostly all log2FC
@@ -211,13 +225,14 @@ if (n_timepoints <= 1) {
     if (normalization) {
         message("Performing quantile normalization on per sample read counts.")
 
-        apply_norm = function(id, cond, var) {
+        apply_norm <- function(id, cond, var) {
             df_orig <- tibble(id = id, cond = cond, var = var)
             df_new <- pivot_wider(df_orig, names_from = cond, values_from = var) %>%
-            column_to_rownames("id") %>% as.matrix %>%
-            limma::normalizeBetweenArrays(method = "quantile") %>%
-            as_tibble(rownames = "id") %>%
-            pivot_longer(-id, names_to = "cond", values_to = "var_norm")
+                column_to_rownames("id") %>%
+                as.matrix() %>%
+                limma::normalizeBetweenArrays(method = "quantile") %>%
+                as_tibble(rownames = "id") %>%
+                pivot_longer(-id, names_to = "cond", values_to = "var_norm")
             left_join(df_orig, df_new, by = c("id", "cond")) %>% pull(var_norm)
         }
 
@@ -227,8 +242,9 @@ if (n_timepoints <= 1) {
             group_by(time) %>%
             mutate(
                 FoldChange_norm = apply_norm(sgRNA, condition, FoldChange),
-                log2FoldChange = log2(FoldChange_norm)) %>%
-            ungroup %>%
+                log2FoldChange = log2(FoldChange_norm)
+            ) %>%
+            ungroup() %>%
             select(-FoldChange, -FoldChange_norm)
     }
 
@@ -240,12 +256,14 @@ if (n_timepoints <= 1) {
     # in a negative score. The fitness score is normalized to the maximum time
     # for a particular condition, and is therefore independent of the duration
     # of the cultivations. Requires at least 2 time points
-    calc_auc <- function(x, y) {sum(diff(x) * (head(y,-1)+tail(y,-1)))/2}
+    calc_auc <- function(x, y) {
+        sum(diff(x) * (head(y, -1) + tail(y, -1))) / 2
+    }
     message("Calculating sgRNA fitness score.")
     DESeq_result_table <- DESeq_result_table %>%
         dplyr::arrange(sgRNA, condition, time) %>%
         dplyr::group_by(sgRNA, condition) %>%
-        dplyr::mutate(fitness = calc_auc(time, log2FoldChange)/(max(time)/2))
+        dplyr::mutate(fitness = calc_auc(time, log2FoldChange) / (max(time) / 2))
 
 
     # CALCULATE SGRNA CORRELATION AND EFFICIENCY
@@ -258,19 +276,25 @@ if (n_timepoints <= 1) {
     # B) sgRNA efficiency = median absolute fitness of an sgRNA over all observations [conditions],
     #        divided by maximum fitness of an sgRNA. A score between 0 and 1.
     if (as.logical(gene_fitness)) {
-
         message("Calculating sgRNA efficiency and correlation.")
         determine_corr <- function(index, value, condition, time) {
             # make correlation matrix
             df <- data.frame(index = index, value = value, condition = condition, time = time)
             cor_matrix <- tidyr::pivot_wider(df, names_from = c("condition", "time"), values_from = value) %>%
-                dplyr::arrange(index) %>% tibble::column_to_rownames("index") %>%
-            as.matrix %>% t %>% stats::cor(method = "pearson")
+                dplyr::arrange(index) %>%
+                tibble::column_to_rownames("index") %>%
+                as.matrix() %>%
+                t() %>%
+                stats::cor(method = "pearson")
             # determine weights
-            weights <- cor_matrix %>% replace(., . == 1, NA) %>%
+            weights <- cor_matrix %>%
+                replace(., . == 1, NA) %>%
                 apply(2, function(x) median(x, na.rm = TRUE)) %>%
-                sapply(function(x) {(x+1)/2}) %>%
-                tibble::enframe("index", "weight") %>% dplyr::mutate(index = as.numeric(index)) %>%
+                sapply(function(x) {
+                    (x + 1) / 2
+                }) %>%
+                tibble::enframe("index", "weight") %>%
+                dplyr::mutate(index = as.numeric(index)) %>%
                 dplyr::mutate(weight = replace(weight, is.na(weight), 1))
             # return vector of weights the same order and length
             # as sgRNA index vector
@@ -279,24 +303,30 @@ if (n_timepoints <= 1) {
 
         DESeq_result_table <- DESeq_result_table %>%
             # split sgRNA names into target gene and position
-            tidyr::separate(sgRNA, into = c("sgRNA_target", "sgRNA_position"), sep = paste0("\\", gene_sep),
-                remove = FALSE) %>%
+            tidyr::separate(sgRNA,
+                into = c("sgRNA_target", "sgRNA_position"), sep = paste0("\\", gene_sep),
+                remove = FALSE
+            ) %>%
             dplyr::group_by(sgRNA_target) %>%
             dplyr::mutate(
                 sgRNA_position = as.numeric(sgRNA_position),
-                sgRNA_index = sgRNA_position %>% as.factor %>% as.numeric,
+                sgRNA_index = sgRNA_position %>% as.factor() %>% as.numeric(),
                 sgRNA_correlation = determine_corr(sgRNA_index, log2FoldChange, condition, time),
                 sgRNA_efficiency = ave(fitness, sgRNA_position, FUN = function(x) median(abs(x))) %>%
-                {./max(.)})
+                    {
+                        . / max(.)
+                    }
+            )
 
-    # SUMMARIZE SGRNA FITNESS TO GENE FITNESS
-    # =======================================
-    #
-    # calculate gene fitness as weighted mean of sgRNA fitness, see README.md
-    # for details and exact formula
+        # SUMMARIZE SGRNA FITNESS TO GENE FITNESS
+        # =======================================
+        #
+        # calculate gene fitness as weighted mean of sgRNA fitness, see README.md
+        # for details and exact formula
         message("Calculating gene fitness and gene log2 fold change.")
         if (gene_controls != "") {
-            df_controls <- DESeq_result_table %>% ungroup %>%
+            df_controls <- DESeq_result_table %>%
+                ungroup() %>%
                 filter(str_detect(sgRNA_target, gene_controls))
         }
         get_controls <- function(condition) {
@@ -310,27 +340,30 @@ if (n_timepoints <= 1) {
         DESeq_result_table <- dplyr::left_join(
             DESeq_result_table,
             DESeq_result_table %>%
-            dplyr::group_by(sgRNA_target, condition, time) %>%
-            dplyr::summarize(.groups = "keep",
-                # gene log2 FC
-                wmean_log2FoldChange = weighted.mean(log2FoldChange, sgRNA_correlation * sgRNA_efficiency),
-                sd_log2FoldChange = sd(log2FoldChange),
-                # gene fitness
-                wmean_fitness = weighted.mean(fitness, sgRNA_correlation * sgRNA_efficiency),
-                sd_fitness = sd(fitness),
-                # apply Wilcoxon rank sum test against Null hypothesis (fitness ~ 0) or
-                # user-supplied set of controls
-                p_fitness = stats::wilcox.test(
-                    x = fitness,
-                    y = get_controls(condition),
-                    alternative = "two.sided")$p.value
-            ), by = c("sgRNA_target", "condition", "time")
+                dplyr::group_by(sgRNA_target, condition, time) %>%
+                dplyr::summarize(
+                    .groups = "keep",
+                    # gene log2 FC
+                    wmean_log2FoldChange = weighted.mean(log2FoldChange, sgRNA_correlation * sgRNA_efficiency),
+                    sd_log2FoldChange = sd(log2FoldChange),
+                    # gene fitness
+                    wmean_fitness = weighted.mean(fitness, sgRNA_correlation * sgRNA_efficiency),
+                    sd_fitness = sd(fitness),
+                    # apply Wilcoxon rank sum test against Null hypothesis (fitness ~ 0) or
+                    # user-supplied set of controls
+                    p_fitness = stats::wilcox.test(
+                        x = fitness,
+                        y = get_controls(condition),
+                        alternative = "two.sided"
+                    )$p.value
+                ),
+            by = c("sgRNA_target", "condition", "time")
         ) %>%
-        group_by(condition, time) %>%
-        mutate(
-            p_fitness_adj = stats::p.adjust(p_fitness, method = "BH"),
-            comb_score = abs(wmean_fitness)*-log10(p_fitness_adj)
-        )
+            group_by(condition, time) %>%
+            mutate(
+                p_fitness_adj = stats::p.adjust(p_fitness, method = "BH"),
+                comb_score = abs(wmean_fitness) * -log10(p_fitness_adj)
+            )
     }
 }
 
@@ -339,7 +372,7 @@ if (n_timepoints <= 1) {
 #
 # Save result tables to output folder, in Rdata format
 message("Saving 'all_counts.tsv'")
-if (packageVersion("readr") %>% substr(0,1) %>% as.numeric >= 2) {
+if (packageVersion("readr") %>% substr(0, 1) %>% as.numeric() >= 2) {
     readr::write_tsv(df_counts, file = "all_counts.tsv")
 } else {
     readr::write_tsv(df_counts, path = "all_counts.tsv")
