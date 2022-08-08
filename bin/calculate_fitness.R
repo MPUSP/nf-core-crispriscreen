@@ -43,7 +43,7 @@ list_req_packages <- c("readr", "dplyr", "tibble", "stringr", "tidyr", "purrr")
 list_to_install <- setdiff(list_req_packages, rownames(installed.packages()))
 if (length(list_to_install)) {
     message(paste0("Missing package(s) ", paste(list_to_install, collapse = ", "), " are installed to '", pkdir, "'."))
-    install.packages(pkgs = list_to_install, lib = pkdir)
+    install.packages(pkgs = list_to_install, lib = pkdir, repos = "https://cloud.r-project.org")
 }
 
 library(readr)
@@ -81,17 +81,19 @@ if (normalization) {
 # Step 1: Load sample layout sheet - file names must be row names
 df_samplesheet <- readr::read_csv(path_samplesheet, col_types = cols()) %>%
     select(all_of(c("sample", "condition", "replicate", "date", "time", "group", "reference_group"))) %>%
-    dplyr::mutate(group = factor(`group`)) %>%
-    tibble::column_to_rownames("sample")
+    dplyr::mutate(group = factor(`group`))
 stopifnot(is.numeric(df_samplesheet$time))
 
-# Check that at least one condition has more than one time point,
-# otherwise skip DESeq2 and fitness calculation
-n_timepoints <- df_samplesheet %>%
+# Check which conditions
+# - do not have differing groups/reference when zero time
+# - have the minimum of two distinct time points OR
+# - are compared to the zero time point of another condition OR
+# - for all others skip DESeq2 and fitness calculation
+df_samplesheet <- df_samplesheet %>%
     dplyr::group_by(condition) %>%
-    dplyr::summarize(t_unique = length(unique(time))) %>%
-    pull(t_unique) %>%
-    max()
+    filter(!(time == 0 & group != reference_group)) %>%
+    filter(length(unique(time)) >= 2 || (time != 0 & group != reference_group)) %>%
+    tibble::column_to_rownames("sample")
 
 df_counts <- list.files(path = getwd(), full.names = TRUE, pattern = ".featureCounts.txt$") %>%
     lapply(function(x) {
@@ -135,8 +137,8 @@ counts <- df_counts %>%
 # Love, M.I., Huber, W., Anders, S. Genome Biology, 15:550, 2014.
 # (https://doi.org/10.1186/s13059-014-0550-8)
 
-if (n_timepoints <= 1) {
-    message("No condition has more than one time point.\nFitness score calculation is omitted")
+if (nrow(df_samplesheet) == 0) {
+    message("No condition has sufficient groups/time points.\nFitness score calculation is omitted")
 } else {
     message("Running DESeq2 for pairwise comparison.\nNote: this step can be time and computation-intense.")
     message(paste0("Number of CPU cores used for DESeq parallel execution: ", number_cores, "."))
@@ -145,9 +147,11 @@ if (n_timepoints <= 1) {
     # Meta data is required to carry out the actual DESeq2 analysis
     # by 'contrasting' (comparing) selected conditions to each other.
     # We check that the order of file names corresponds to colnames of counts
-    if (!all(colnames(counts) == row.names(df_samplesheet))) {
-        counts <- counts[row.names(df_samplesheet)]
+    if (!all(row.names(df_samplesheet) %in% colnames(counts))) {
+        stop("Not all samples listed in the sample sheet have
+            corresponding read count data.")
     }
+    counts <- counts[row.names(df_samplesheet)]
 
     # 3. Perform DESeq2 analysis
     DESeq_result <- DESeqDataSetFromMatrix(
@@ -184,7 +188,7 @@ if (n_timepoints <= 1) {
     # ======================
     #
     # complete metadata table with missing time zero conditions for the cases
-    # where samples are used as zero time points for _multiple_ different conditions
+    # where samples are used as zero time points for_multiple_different conditions
     if (!all(df_samplesheet %>% dplyr::group_by(condition) %>%
         dplyr::summarize(zero_cond = 0 %in% time) %>%
         dplyr::pull(zero_cond))
@@ -378,7 +382,7 @@ if (packageVersion("readr") %>% substr(0, 1) %>% as.numeric() >= 2) {
     readr::write_tsv(df_counts, path = "all_counts.tsv")
 }
 
-if (n_timepoints > 1) {
+if (nrow(df_samplesheet) > 0) {
     message("Saving 'result.Rdata'")
     save(DESeq_result_table, file = "result.Rdata")
     message("Saving 'result.tsv'")
