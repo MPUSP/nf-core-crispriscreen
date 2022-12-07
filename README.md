@@ -42,28 +42,47 @@ On release, automated continuous integration tests run the pipeline on a full-si
 
 ## Quick Start
 
-1. Install [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation) (`>=21.10.3`)
+1. Install [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation) (`>=21.10.3`).
+   It is recommended to use [`Conda`](https://conda.io/miniconda.html) (or `mamba` / `micromamba`) to install all dependencies in a fresh environment.
+
+   ```console
+   conda create --name env_nf
+   conda activate env_nf
+   conda install -c conda-forge nextflow
+   ```
 
 2. Install any of [`Docker`](https://docs.docker.com/engine/installation/), [`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/) (you can follow [this tutorial](https://singularity-tutorial.github.io/01-installation/)), [`Podman`](https://podman.io/), [`Shifter`](https://nersc.gitlab.io/development/shifter/how-to-use/) or [`Charliecloud`](https://hpc.github.io/charliecloud/) for full pipeline reproducibility _(you can use [`Conda`](https://conda.io/miniconda.html) both to install Nextflow itself and also to manage software within pipelines. Please only use it within pipelines as a last resort; see [docs](https://nf-co.re/usage/configuration#basic-configuration-profiles))_.
 
-3. Download the pipeline and test it on a minimal dataset with a single command:
-
    ```console
-   nextflow run nf-core/crispriscreen -profile test,YOURPROFILE --outdir <OUTDIR>
+   conda install -c conda-forge singularity
    ```
 
-   Note that some form of configuration will be needed so that Nextflow knows how to fetch the required software. This is usually done in the form of a config profile (`YOURPROFILE` in the example command above). You can chain multiple config profiles in a comma-separated string.
+3. Download the pipeline.
+   
+   ```console
+   cd <your/target/dir>
+   git clone https://github.com/m-jahn/nf-core-crispriscreen
+   ```
+   
+4. test it on the minimal dataset included with this repository. Since `nf-core-crispriscreen` is not a canonical nf-core pipeline (yet), it is necessary to indicate the path to the pipeline folder after the `run` statement.
+
+   Generalized command to run the pipeline:
+
+   ```console
+   nextflow run <path/to/nf-core-crispriscreen> -profile <docker/singularity/podman/shifter/charliecloud/conda/institute> --input <sample_sheet> --fasta <fasta_file> --outdir <path/to/output>
+   ```
+
+   Command that will run the pipeline on the enclosed test data using `Singularity` (recommended):
+
+   ```console
+   nextflow run ./ -profile singularity --input "testing/fastq/samplesheet.csv" --fasta "testing/ref/Synechocystis_v2.fasta" --outdir "results/"
+   ```
 
    > - The pipeline comes with config profiles called `docker`, `singularity`, `podman`, `shifter`, `charliecloud` and `conda` which instruct the pipeline to use the named tool for software management. For example, `-profile test,docker`.
    > - Please check [nf-core/configs](https://github.com/nf-core/configs#documentation) to see if a custom config file to run nf-core pipelines already exists for your Institute. If so, you can simply use `-profile <institute>` in your command. This will enable either `docker` or `singularity` and set the appropriate execution settings for your local compute environment.
    > - If you are using `singularity`, please use the [`nf-core download`](https://nf-co.re/tools/#downloading-pipelines-for-offline-use) command to download images first, before running the pipeline. Setting the [`NXF_SINGULARITY_CACHEDIR` or `singularity.cacheDir`](https://www.nextflow.io/docs/latest/singularity.html?#singularity-docker-hub) Nextflow options enables you to store and re-use the images from a central location for future pipeline runs.
    > - If you are using `conda`, it is highly recommended to use the [`NXF_CONDA_CACHEDIR` or `conda.cacheDir`](https://www.nextflow.io/docs/latest/conda.html) settings to store the environments in a central location for future pipeline runs.
 
-4. Start running your own analysis!
-
-   ```console
-   nextflow run nf-core-crispriscreen -profile <docker/singularity/podman/shifter/charliecloud/conda/institute> --input "test/fastq/samplesheet.csv" --fasta "test/ref/library.fasta" --outdir <OUTDIR>
-   ```
 
 ## Documentation
 
