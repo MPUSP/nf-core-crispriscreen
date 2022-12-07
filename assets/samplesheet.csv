@@ -1,4 +1,13 @@
 sample,fastq_1,fastq_2,condition,replicate,date,time,group,reference_group
-Example_S1_R1,./test/fastq/Example_S1_R1.fastq.gz,,example,1,2021_01_09,0,1,1
-Example_S1_R2,./test/fastq/Example_S1_R2.fastq.gz,,example,2,2021_01_09,0,1,1
-Example_S1_R3,./test/fastq/Example_S1_R3.fastq.gz,,example,3,2021_01_09,0,1,1
+Example_S1_R1,assets/fastq/Example_S1_R1.fastq.gz,,example,1,2021_01_09,0,1,1
+Example_S1_R2,assets/fastq/Example_S1_R2.fastq.gz,,example,2,2021_01_09,0,1,1
+Example_S1_R3,assets/fastq/Example_S1_R3.fastq.gz,,example,3,2021_01_09,0,1,1
+Example_S2_R1,assets/fastq/Example_S2_R1.fastq.gz,,example,1,2021_01_09,4,2,1
+Example_S2_R2,assets/fastq/Example_S2_R2.fastq.gz,,example,2,2021_01_09,4,2,1
+Example_S2_R3,assets/fastq/Example_S2_R3.fastq.gz,,example,3,2021_01_09,4,2,1
+Example_S3_R1,assets/fastq/Example_S3_R1.fastq.gz,,example,1,2021_01_09,8,3,1
+Example_S3_R2,assets/fastq/Example_S3_R2.fastq.gz,,example,2,2021_01_09,8,3,1
+Example_S3_R3,assets/fastq/Example_S3_R3.fastq.gz,,example,3,2021_01_09,8,3,1
+Example_S4_R1,assets/fastq/Example_S4_R1.fastq.gz,,example,1,2021_01_09,10,4,1
+Example_S4_R2,assets/fastq/Example_S4_R2.fastq.gz,,example,2,2021_01_09,10,4,1
+Example_S4_R3,assets/fastq/Example_S4_R3.fastq.gz,,example,3,2021_01_09,10,4,1

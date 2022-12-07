@@ -131,8 +131,9 @@ workflow CRISPRISCREEN {
     // MODULE: Bowtie2  - build genome database index from fasta input
     //
     BOWTIE2_BUILD (
-        ch_fasta
+        [ [ id:'fasta' ], ch_fasta ]
     )
+    ch_bowtie2_index = BOWTIE2_BUILD.out.index
     ch_versions = ch_versions.mix(BOWTIE2_BUILD.out.versions)
 
     //
@@ -140,7 +141,7 @@ workflow CRISPRISCREEN {
     //
     BOWTIE2_ALIGN (
         ch_trimmedreads,
-        BOWTIE2_BUILD.out.index,
+        ch_bowtie2_index,
         params.save_unaligned,
         params.sort_bam
     )

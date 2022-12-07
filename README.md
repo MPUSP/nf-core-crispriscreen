@@ -75,7 +75,8 @@ On release, automated continuous integration tests run the pipeline on a full-si
    Command that will run the pipeline on the enclosed test data using `Singularity` (recommended):
 
    ```console
-   nextflow run ./ -profile singularity --input "testing/fastq/samplesheet.csv" --fasta "testing/ref/Synechocystis_v2.fasta" --outdir "results/"
+   cd path/to/nf-core-crispriscreen
+   nextflow run ./ -profile singularity --input assets/samplesheet.csv" --fasta "assets/library.fasta" --outdir "results"
    ```
 
    > - The pipeline comes with config profiles called `docker`, `singularity`, `podman`, `shifter`, `charliecloud` and `conda` which instruct the pipeline to use the named tool for software management. For example, `-profile test,docker`.

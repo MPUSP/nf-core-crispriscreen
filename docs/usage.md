@@ -70,10 +70,17 @@ An [example samplesheet](../assets/samplesheet.csv) has been provided with the p
 The typical command for running the pipeline is as follows:
 
 ```console
-nextflow run nf-core/crispriscreen --input samplesheet.csv --outdir <OUTDIR> --fasta <LIBRARY.fasta> -profile docker
+nextflow run <path/to/nf-core-crispriscreen> -profile <docker/singularity/podman/shifter/charliecloud/conda/institute> --input <sample_sheet> --fasta <fasta_file> --outdir <path/to/output>
 ```
 
-This will launch the pipeline with the `docker` configuration profile. The pipeline was successfully tested with `docker` and `singularity` profiles. See below for more information about profiles.
+To run the pipeline with the enclosed sample data in `assets/`, run:
+
+```console
+cd path/to/nf-core-crispriscreen
+nextflow run ./ -profile singularity --input assets/samplesheet.csv" --fasta "assets/library.fasta" --outdir "results"
+```
+
+The pipeline was successfully tested with `docker` and `singularity` profiles. See below for more information about profiles.
 
 Note that the pipeline will create the following files in your working directory:
 
