@@ -52,15 +52,15 @@ include { FITNESS } from '../modules/local/calculate_fitness'
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include { FASTQC                      } from '../modules/nf-core/modules/fastqc/main'
-include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
-include { TRIMGALORE                  } from '../modules/nf-core/modules/trimgalore/main'
-include { SEQTK_SAMPLE                } from '../modules/nf-core/modules/seqtk/sample/main'
-include { BOWTIE2_BUILD               } from '../modules/nf-core/modules/bowtie2/build/main'
-include { BOWTIE2_ALIGN               } from '../modules/nf-core/modules/bowtie2/align/main'
-include { SUBREAD_FEATURECOUNTS       } from '../modules/nf-core/modules/subread/featurecounts/main'
-include { RMARKDOWNNOTEBOOK           } from '../modules/nf-core/modules/rmarkdownnotebook/main'
-include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
+include { FASTQC                      } from '../modules/nf-core/fastqc/main'
+include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
+include { TRIMGALORE                  } from '../modules/nf-core/trimgalore/main'
+include { SEQTK_SAMPLE                } from '../modules/nf-core/seqtk/sample/main'
+include { BOWTIE2_BUILD               } from '../modules/nf-core/bowtie2/build/main'
+include { BOWTIE2_ALIGN               } from '../modules/nf-core/bowtie2/align/main'
+include { SUBREAD_FEATURECOUNTS       } from '../modules/nf-core/subread/featurecounts/main'
+include { RMARKDOWNNOTEBOOK           } from '../modules/nf-core/rmarkdownnotebook/main'
+include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -62,7 +62,7 @@ if (normalization) {
 list_to_install <- setdiff(list_bioc_packages, rownames(installed.packages()))
 if (length(list_to_install)) {
     message(paste0("Missing package(s) ", paste(list_to_install, collapse = ", "), " are installed to '", pkdir, "'."))
-    install.packages(pkgs = "BiocManager", lib = pkdir)
+    install.packages(pkgs = "BiocManager", lib = pkdir, repos = "https://cloud.r-project.org")
     BiocManager::install(
         pkgs = list_to_install, lib = pkdir,
         update = FALSE, ask = FALSE
