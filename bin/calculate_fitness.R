@@ -102,7 +102,7 @@ df_counts <- list.files(path = getwd(), full.names = TRUE, pattern = ".featureCo
             cols = matches("*.\\.bam$"),
             names_to = "sample", values_to = "numreads"
         )
-        df <- dplyr::mutate(df, sample = stringr::str_remove(sample, "\\.bam$"))
+        df <- dplyr::mutate(df, sample = stringr::str_remove(sample, "\\_T[0-9]+\\.bam$"))
         df
     }) %>%
     dplyr::bind_rows() %>%

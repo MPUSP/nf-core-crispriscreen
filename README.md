@@ -7,14 +7,13 @@
 
 [![GitHub Actions CI Status](https://github.com/m-jahn/nf-core-crispriscreen/workflows/nf-core%20CI/badge.svg)](https://github.com/m-jahn/nf-core-crispriscreen/actions?query=workflow%3A%22nf-core+CI%22)
 [![GitHub Actions Linting Status](https://github.com/m-jahn/nf-core-crispriscreen/workflows/nf-core%20linting/badge.svg)](https://github.com/m-jahn/nf-core-crispriscreen/actions?query=workflow%3A%22nf-core+linting%22)
-[![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A521.10.3-23aa62.svg?labelColor=000000)](https://www.nextflow.io/)
+[![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A521.10.3-23aa62.svg)](https://www.nextflow.io/)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
 [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
 [![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)
+[![Launch on Nextflow Tower](https://img.shields.io/badge/Launch%20%F0%9F%9A%80-Nextflow%20Tower-%234256e7)](https://tower.nf/launch?pipeline=https://github.com/nf-core/crispriscreen)
 
-[![Get help on Slack](http://img.shields.io/badge/slack-nf--core%20%23crispriscreen-4A154B?labelColor=000000&logo=slack)](https://nfcore.slack.com/channels/crispriscreen)
-[![Follow on Twitter](http://img.shields.io/badge/twitter-%40nf__core-1DA1F2?labelColor=000000&logo=twitter)](https://twitter.com/nf_core)
-[![Watch on YouTube](http://img.shields.io/badge/youtube-nf--core-FF0000?labelColor=000000&logo=youtube)](https://www.youtube.com/c/nf-core)
+[![Get help on Slack](http://img.shields.io/badge/slack-nf--core%20%23crispriscreen-4A154B?labelColor=000000&logo=slack)](https://nfcore.slack.com/channels/crispriscreen)[![Follow on Twitter](http://img.shields.io/badge/twitter-%40nf__core-1DA1F2?labelColor=000000&logo=twitter)](https://twitter.com/nf_core)[![Watch on YouTube](http://img.shields.io/badge/youtube-nf--core-FF0000?labelColor=000000&logo=youtube)](https://www.youtube.com/c/nf-core)
 
 ## Introduction
 
@@ -72,7 +71,7 @@ On release, automated continuous integration tests run the pipeline on a full-si
    nextflow run <path/to/nf-core-crispriscreen> -profile <docker/singularity/podman/shifter/charliecloud/conda/institute> --input <sample_sheet> --fasta <fasta_file> --outdir <path/to/output>
    ```
 
-   THe command to run the pipeline on the enclosed test data using `Singularity` (recommended):
+   The command to run the pipeline on the enclosed test data using `Singularity` (recommended):
 
    ```console
    cd path/to/nf-core-crispriscreen
