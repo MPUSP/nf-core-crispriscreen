@@ -58,32 +58,31 @@ On release, automated continuous integration tests run the pipeline on a full-si
    ```
 
 3. Download the pipeline.
-   
+
    ```console
    cd <your/target/dir>
    git clone https://github.com/m-jahn/nf-core-crispriscreen
    ```
-   
-4. test it on the minimal dataset included with this repository. Since `nf-core-crispriscreen` is not a canonical nf-core pipeline (yet), it is necessary to indicate the path to the pipeline folder after the `run` statement.
 
-   Generalized command to run the pipeline:
+4. Test it on the minimal dataset included with this repository. Since `nf-core-crispriscreen` is not a canonical `nf-core` pipeline (yet), it is necessary to indicate the path to the pipeline folder after the `run` statement.
+
+   The generalized command to run the pipeline:
 
    ```console
    nextflow run <path/to/nf-core-crispriscreen> -profile <docker/singularity/podman/shifter/charliecloud/conda/institute> --input <sample_sheet> --fasta <fasta_file> --outdir <path/to/output>
    ```
 
-   Command that will run the pipeline on the enclosed test data using `Singularity` (recommended):
+   THe command to run the pipeline on the enclosed test data using `Singularity` (recommended):
 
    ```console
    cd path/to/nf-core-crispriscreen
-   nextflow run ./ -profile singularity --input assets/samplesheet.csv" --fasta "assets/library.fasta" --outdir "results"
+   nextflow run ./ -profile singularity --input "assets/samplesheet.csv" --fasta "assets/library.fasta" --outdir "results"
    ```
 
    > - The pipeline comes with config profiles called `docker`, `singularity`, `podman`, `shifter`, `charliecloud` and `conda` which instruct the pipeline to use the named tool for software management. For example, `-profile test,docker`.
    > - Please check [nf-core/configs](https://github.com/nf-core/configs#documentation) to see if a custom config file to run nf-core pipelines already exists for your Institute. If so, you can simply use `-profile <institute>` in your command. This will enable either `docker` or `singularity` and set the appropriate execution settings for your local compute environment.
    > - If you are using `singularity`, please use the [`nf-core download`](https://nf-co.re/tools/#downloading-pipelines-for-offline-use) command to download images first, before running the pipeline. Setting the [`NXF_SINGULARITY_CACHEDIR` or `singularity.cacheDir`](https://www.nextflow.io/docs/latest/singularity.html?#singularity-docker-hub) Nextflow options enables you to store and re-use the images from a central location for future pipeline runs.
    > - If you are using `conda`, it is highly recommended to use the [`NXF_CONDA_CACHEDIR` or `conda.cacheDir`](https://www.nextflow.io/docs/latest/conda.html) settings to store the environments in a central location for future pipeline runs.
-
 
 ## Documentation
 

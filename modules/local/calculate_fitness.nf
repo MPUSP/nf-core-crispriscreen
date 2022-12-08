@@ -2,8 +2,8 @@ process FITNESS {
     tag "$samplesheet"
     label "process_high"
 
-    conda (params.enable_conda ? "conda-forge::r-base=4.0 conda-forge::r-tidyverse bioconda::bioconductor-deseq2=1.28.0 bioconda::bioconductor-biocparallel bioconda::bioconductor-limma" : null)
-    
+    conda (params.enable_conda ? "conda-forge::r-base=4.2.2 conda-forge::r-tidyverse=1.3.2 bioconda::bioconductor-deseq2=1.38.0 bioconda::bioconductor-biocparallel=1.32.0 bioconda::bioconductor-limma=3.54.0" : null)
+
     input:
     path samplesheet
     path counts
@@ -35,7 +35,9 @@ process FITNESS {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         r-base: \$(echo \$(R --version 2>&1) | sed 's/^.*R version //; s/ .*\$//')
+        r-tidyverse: \$(Rscript -e "library(tidyverse); cat(as.character(packageVersion('tidyverse')))")
         bioconductor-deseq2: \$(Rscript -e "library(DESeq2); cat(as.character(packageVersion('DESeq2')))")
+        bioconductor-biocparallel: \$(Rscript -e "library(biocparallel); cat(as.character(packageVersion('biocparallel')))")
         bioconductor-limma: \$(Rscript -e "library(limma); cat(as.character(packageVersion('limma')))")
     END_VERSIONS
     """
