@@ -7,7 +7,7 @@
 
 [![GitHub Actions CI Status](https://github.com/m-jahn/nf-core-crispriscreen/workflows/nf-core%20CI/badge.svg)](https://github.com/m-jahn/nf-core-crispriscreen/actions?query=workflow%3A%22nf-core+CI%22)
 [![GitHub Actions Linting Status](https://github.com/m-jahn/nf-core-crispriscreen/workflows/nf-core%20linting/badge.svg)](https://github.com/m-jahn/nf-core-crispriscreen/actions?query=workflow%3A%22nf-core+linting%22)
-[![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A521.10.3-23aa62.svg)](https://www.nextflow.io/)
+[![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A522.10.1-23aa62.svg)](https://www.nextflow.io/)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
 [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
 [![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)
@@ -41,7 +41,7 @@ On release, automated continuous integration tests run the pipeline on a full-si
 
 ## Quick Start
 
-1. Install [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation) (`>=21.10.3`).
+1. Install [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation) (`>=22.10.1`).
    It is recommended to use [`Conda`](https://conda.io/miniconda.html) (or `mamba` / `micromamba`) to install all dependencies in a fresh environment.
 
    ```console
