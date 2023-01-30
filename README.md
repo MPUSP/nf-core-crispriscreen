@@ -5,8 +5,8 @@
 [![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.XXXXXXX-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.XXXXXXX)
 -->
 
-[![GitHub Actions CI Status](https://github.com/m-jahn/nf-core-crispriscreen/workflows/nf-core%20CI/badge.svg)](https://github.com/m-jahn/nf-core-crispriscreen/actions?query=workflow%3A%22nf-core+CI%22)
-[![GitHub Actions Linting Status](https://github.com/m-jahn/nf-core-crispriscreen/workflows/nf-core%20linting/badge.svg)](https://github.com/m-jahn/nf-core-crispriscreen/actions?query=workflow%3A%22nf-core+linting%22)
+[![GitHub Actions CI Status](https://github.com/MPUSP/nf-core-crispriscreen/workflows/nf-core%20CI/badge.svg)](https://github.com/MPUSP/nf-core-crispriscreen/actions?query=workflow%3A%22nf-core+CI%22)
+[![GitHub Actions Linting Status](https://github.com/MPUSP/nf-core-crispriscreen/workflows/nf-core%20linting/badge.svg)](https://github.com/MPUSP/nf-core-crispriscreen/actions?query=workflow%3A%22nf-core+linting%22)
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A522.10.1-23aa62.svg)](https://www.nextflow.io/)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
 [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
@@ -60,7 +60,7 @@ On release, automated continuous integration tests run the pipeline on a full-si
 
    ```console
    cd <your/target/dir>
-   git clone https://github.com/m-jahn/nf-core-crispriscreen
+   git clone https://github.com/MPUSP/nf-core-crispriscreen
    ```
 
 4. Test it on the minimal dataset included with this repository. Since `nf-core-crispriscreen` is not a canonical `nf-core` pipeline (yet), it is necessary to indicate the path to the pipeline folder after the `run` statement.
@@ -87,7 +87,7 @@ On release, automated continuous integration tests run the pipeline on a full-si
 
 <!-- TODO: Add links to main nf-core website if published, e.g. [usage](https://nf-co.re/crispriscreen/usage) -->
 
-The nf-core/crispriscreen pipeline comes with documentation about the pipeline [usage](https://m-jahn.github.io/nf-core-crispriscreen/usage) and [output](https://m-jahn.github.io/nf-core-crispriscreen/output).
+The nf-core/crispriscreen pipeline comes with documentation about the pipeline [usage](https://MPUSP.github.io/nf-core-crispriscreen/usage) and [output](https://MPUSP.github.io/nf-core-crispriscreen/output).
 
 ## Credits
 
