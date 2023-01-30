@@ -57,6 +57,7 @@ include { FITNESS } from '../modules/local/calculate_fitness'
 include { FASTQC                      } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 include { TRIMGALORE                  } from '../modules/nf-core/trimgalore/main'
+include { CUTADAPT                    } from '../modules/nf-core/cutadapt/main'
 include { SEQTK_SAMPLE                } from '../modules/nf-core/seqtk/sample/main'
 include { BOWTIE2_BUILD               } from '../modules/nf-core/bowtie2/build/main'
 include { BOWTIE2_ALIGN               } from '../modules/nf-core/bowtie2/align/main'
@@ -108,7 +109,7 @@ workflow CRISPRISCREEN {
     }
 
     //
-    // MODULE: Run Trim galore to cut adapters and filter by quality
+    // MODULE: Run Trim galore to cut _generic_ (e.g. illumina) adapters and filter by quality
     //
     ch_trimmedreads = Channel.empty()
     if (params.skip_trimming) {
@@ -122,10 +123,25 @@ workflow CRISPRISCREEN {
     }
 
     //
+    // MODULE: Run cutadapt to cut _specific adapters_ such as primer sequences
+    //
+    ch_cutreads = Channel.empty()
+    if (params.skip_trimming) {
+        ch_cutreads = ch_trimmedreads
+    } else {
+        CUTADAPT (
+            ch_trimmedreads
+        )
+        ch_cutreads = CUTADAPT.out.reads
+        ch_versions = ch_versions.mix(CUTADAPT.out.versions)
+    }
+
+
+    //
     // MODULE: Run FastQC
     //
     FASTQC (
-        ch_trimmedreads
+        ch_cutreads
     )
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
 
@@ -142,7 +158,7 @@ workflow CRISPRISCREEN {
     // MODULE: Bowtie2  - align (filtered) reads to reference
     //
     BOWTIE2_ALIGN (
-        ch_trimmedreads,
+        ch_cutreads,
         ch_bowtie2_index,
         params.save_unaligned,
         params.sort_bam

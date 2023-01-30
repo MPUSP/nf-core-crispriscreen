@@ -29,15 +29,16 @@ On release, automated continuous integration tests run the pipeline on a full-si
 
 1. Sub-sampling of reads ([`Seqtk/sample`](https://github.com/lh3/seqtk), optional)
 2. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
-3. Adapter and quality trimming ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
-4. Preparation of `*.fasta` library (custom [`R` script](https://cran.r-project.org/))
-5. Alignment using ([`Bowtie2`](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml))
+3. Generic adapter and quality trimming ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
+4. Specific primer sequence trimming ([`cutadapt`](https://cutadapt.readthedocs.io/en/stable/index.html))
+5. Preparation of `*.fasta` library (custom [`R` script](https://cran.r-project.org/))
+6. Alignment using ([`Bowtie2`](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml))
    1. Build index from `*.fasta` library
    2. Align reads to library
-6. Count reads per target and input file ([`subread/featurecounts`](https://nf-co.re/modules/subread_featurecounts))
-7. Quantify gene fitness score from multiple targets per gene, report statistics ([`DESeq2`](https://bioconductor.org/packages/release/bioc/html/DESeq2.html))
-8. Generate HTML report with fitness results ([`R markdown`](https://nf-co.re/modules/rmarkdownnotebook))
-9. Present QC for raw and mapped reads ([`MultiQC`](http://multiqc.info/))
+7. Count reads per target and input file ([`subread/featurecounts`](https://nf-co.re/modules/subread_featurecounts))
+8. Quantify gene fitness score from multiple targets per gene, report statistics ([`DESeq2`](https://bioconductor.org/packages/release/bioc/html/DESeq2.html))
+9. Generate HTML report with fitness results ([`R markdown`](https://nf-co.re/modules/rmarkdownnotebook))
+10. Present QC for raw and mapped reads ([`MultiQC`](http://multiqc.info/))
 
 ## Quick Start
 
