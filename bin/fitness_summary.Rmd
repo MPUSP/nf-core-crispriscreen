@@ -200,6 +200,7 @@ plot_sgRNA_correlation_hist <- DESeq_result_table %>%
   # plot
   ggplot(aes(x = median_sgRNA_correlation)) +
   geom_histogram(bins = 40, fill = custom_colors[1], alpha = 0.7) +
+  labs(x = "median barcode correlation", y = "count") +
   custom_theme()
 
 plot_sgRNA_correlation
@@ -224,7 +225,7 @@ plot_sgRNA_efficiency <- DESeq_result_table %>%
   distinct() %>%
   ggplot(aes(x = factor(sgRNA_index), y = sgRNA_efficiency)) +
   geom_boxplot(notch = FALSE, outlier.shape = ".") +
-  labs(x = "sgRNA position (relative)", y = "repression efficiency") +
+  labs(x = "barcode position (relative)", y = "repression efficiency") +
   coord_cartesian(ylim = c(-0.15, 1.15)) +
   stat_summary(fun.data = function(x) {
     c(
@@ -252,7 +253,7 @@ plot_sgRNA_efficiency_hist <- DESeq_result_table %>%
   summarize(sgRNA_efficiency = median(sgRNA_efficiency), n_pos = n()) %>%
   filter(n_pos >= 10) %>%
   ggplot(aes(x = sgRNA_position, y = sgRNA_efficiency)) +
-  labs(x = "sgRNA position (nt)", y = "repression efficiency") +
+  labs(x = "barcode position (nt)", y = "repression efficiency") +
   geom_point(col = alpha(custom_colors[5], 0.5)) +
   geom_smooth(formula = "y ~ x", method = "loess") +
   custom_theme()
@@ -298,6 +299,24 @@ DESeq_result_table %>%
   custom_theme()
 ```
 
+- This plot shows the global distribution of effect size versus significance score
+- Effect size is the weighted mean fitness of all barcodes
+- Significance is the adjusted p-value from 2-sided Wilcoxon rank sum test
+- This plot is useful to judge how many genes are _significant_ enriched or depleted
+
+```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE, eval = eval_chunks}
+DESeq_result_table %>%
+  filter(time == 0) %>%
+  group_by(condition, sgRNA_target) %>%
+  summarize(
+    wmean_fitness = unique(wmean_fitness),
+    p_fitness_adj = unique(p_fitness_adj)
+    , .groups = "drop") %>%
+  ggplot(aes(x = wmean_fitness, y = -log10(p_fitness_adj))) +
+  geom_point() +
+  facet_wrap(~condition) +
+  custom_theme()
+```
 
 # Report info
 
