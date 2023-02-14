@@ -4,8 +4,7 @@
 # R script to import a *.fasta file and convert it to an *.saf genome
 # annotation file. This script is part of the nextflow pipeline
 # 'nf-core-crispriscreen' for processing of CRISPRi library data.
-# The pipeline can be found at https://github.com/m-jahn/nf-core-crispriscreen.
-# It uses only base R to keep dependencies low.
+# The pipeline can be found at https://github.com/MPUSP/nf-core-crispriscreen.
 #
 # Date: 2022-04-11
 # Author: Michael Jahn, PhD

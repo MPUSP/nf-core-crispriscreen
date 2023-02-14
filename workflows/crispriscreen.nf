@@ -43,6 +43,7 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 // MODULE: Local non nf-core modules
 //
 include { PREPARE_LIBRARY } from '../modules/local/prepare_library'
+include { PREPARE_COUNTS } from '../modules/local/prepare_counts'
 include { FITNESS } from '../modules/local/calculate_fitness'
 
 /*
@@ -62,6 +63,7 @@ include { SEQTK_SAMPLE                } from '../modules/nf-core/seqtk/sample/ma
 include { BOWTIE2_BUILD               } from '../modules/nf-core/bowtie2/build/main'
 include { BOWTIE2_ALIGN               } from '../modules/nf-core/bowtie2/align/main'
 include { SUBREAD_FEATURECOUNTS       } from '../modules/nf-core/subread/featurecounts/main'
+include { MAGECK_MLE                  } from '../modules/nf-core/mageck/mle/main'
 include { RMARKDOWNNOTEBOOK           } from '../modules/nf-core/rmarkdownnotebook/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 
@@ -179,9 +181,6 @@ workflow CRISPRISCREEN {
     )
     ch_versions = ch_versions.mix(SUBREAD_FEATURECOUNTS.out.versions.first())
 
-    //
-    // MODULE: Calculate guide RNA and gene fitness score from read counts using DESeq2
-    //
     ch_featurecounts = Channel.empty()
     ch_featurecounts = SUBREAD_FEATURECOUNTS.out.counts
     ch_featurecounts
@@ -189,6 +188,22 @@ workflow CRISPRISCREEN {
         .collect()
         .set { ch_featurecounts }
 
+    //
+    // MODULE: Calculate guide RNA and gene fitness score from read counts using Mageck
+    //
+    PREPARE_COUNTS (
+        ch_input, ch_featurecounts, params.gene_sep
+    )
+
+    MAGECK_MLE (
+        [ [ id:'mageck' ], file("$projectDir/results/prepare/all_counts.tsv") ],
+        PREPARE_COUNTS.out.design
+    )
+    ch_versions = ch_versions.mix(MAGECK_MLE.out.versions)
+
+    //
+    // MODULE: Calculate guide RNA and gene fitness score from read counts using DESeq2
+    //
     FITNESS (
         ch_input, ch_featurecounts, params.normalization,
         params.gene_fitness, params.gene_sep
