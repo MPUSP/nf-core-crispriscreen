@@ -138,7 +138,6 @@ workflow CRISPRISCREEN {
         ch_versions = ch_versions.mix(CUTADAPT.out.versions)
     }
 
-
     //
     // MODULE: Run FastQC
     //
@@ -148,7 +147,7 @@ workflow CRISPRISCREEN {
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
 
     //
-    // MODULE: Bowtie2  - build genome database index from fasta input
+    // MODULE: Bowtie2 - build genome database index from fasta input
     //
     BOWTIE2_BUILD (
         [ [ id:'fasta' ], ch_fasta ]
@@ -157,7 +156,7 @@ workflow CRISPRISCREEN {
     ch_versions = ch_versions.mix(BOWTIE2_BUILD.out.versions)
 
     //
-    // MODULE: Bowtie2  - align (filtered) reads to reference
+    // MODULE: Bowtie2 - align (filtered) reads to reference
     //
     BOWTIE2_ALIGN (
         ch_cutreads,
@@ -189,20 +188,23 @@ workflow CRISPRISCREEN {
         .set { ch_featurecounts }
 
     //
-    // MODULE: Calculate guide RNA and gene fitness score from read counts using Mageck
+    // MODULE: Calculate gene fitness from read counts using Mageck
     //
     PREPARE_COUNTS (
         ch_input, ch_featurecounts, params.gene_sep
     )
 
+    ch_all_counts = PREPARE_COUNTS.out.all_counts
+        .map { [ [ id: "all_counts" ], it ] }
+
     MAGECK_MLE (
-        [ [ id:'mageck' ], file("$projectDir/results/prepare/all_counts.tsv") ],
+        ch_all_counts,
         PREPARE_COUNTS.out.design
     )
     ch_versions = ch_versions.mix(MAGECK_MLE.out.versions)
 
     //
-    // MODULE: Calculate guide RNA and gene fitness score from read counts using DESeq2
+    // MODULE: Calculate gene fitness from read counts using DESeq2
     //
     FITNESS (
         ch_input, ch_featurecounts, params.normalization,
