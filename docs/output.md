@@ -18,9 +18,12 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 6. Alignment using ([`Bowtie2`](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml))
    1. Build index from `*.fasta` library
    2. Align reads to library
+   3. Optional filtering by mapping quality
 7. Count reads per target and input file ([`subread/featurecounts`](https://nf-co.re/modules/subread_featurecounts))
-8. Quantify gene fitness score from multiple targets per gene, report statistics ([`DESeq2`](https://bioconductor.org/packages/release/bioc/html/DESeq2.html))
-9. Generate HTML report with fitness results ([`R markdown`](https://nf-co.re/modules/rmarkdownnotebook))
+8. Quantify gene fitness score from multiple targets per gene
+   1. Option 1: Gene fitness is calculated using [`Mageck` MLE](https://sourceforge.net/p/mageck/wiki/Home/)
+   2. Option 2: Gene fitness is calculated using [`DESeq2`](https://bioconductor.org/packages/release/bioc/html/DESeq2.html)
+9.  Generate HTML report with fitness results ([`R markdown`](https://nf-co.re/modules/rmarkdownnotebook))
 10. Present QC for raw and mapped reads ([`MultiQC`](http://multiqc.info/))
 
 ### Seqtk/Sample
@@ -125,6 +128,17 @@ In case a pattern has been supplied but no matching barcodes were found, it stop
 
 Summarizes read counts per target and input file, see [`subread/featurecounts`](https://nf-co.re/modules/subread_featurecounts).
 This is the input for fitness score calculation with DESeq2.
+
+### Mageck
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `mageck/`
+  - `all_counts.gene_summary.txt`: Table with `beta` score, `z` score, p-value and false discovery rate for all targeted genes.
+  - `all_counts.sgrna_summary.txt`: Table with overview of sgRNA-gene association and sgRNA efficiency.
+
+</details>
 
 ### DESeq2
 
