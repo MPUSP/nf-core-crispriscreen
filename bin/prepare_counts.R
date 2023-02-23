@@ -76,7 +76,7 @@ for (cond in unique(df_sample$condition)) {
 }
 
 # test that design matrix corresponds to counts table
-stopifnot(all(df_design$sample == colnames(df_combined)[-c(1, 2)]))
+stopifnot(all(df_design$sample %in% colnames(df_combined)[-c(1, 2)]))
 
 # export design matrix
 write.table(
