@@ -23,7 +23,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 8. Quantify gene fitness score from multiple targets per gene
    1. Option 1: Gene fitness is calculated using [`Mageck` MLE](https://sourceforge.net/p/mageck/wiki/Home/)
    2. Option 2: Gene fitness is calculated using [`DESeq2`](https://bioconductor.org/packages/release/bioc/html/DESeq2.html)
-9.  Generate HTML report with fitness results ([`R markdown`](https://nf-co.re/modules/rmarkdownnotebook))
+9. Generate HTML report with fitness results ([`R markdown`](https://nf-co.re/modules/rmarkdownnotebook))
 10. Present QC for raw and mapped reads ([`MultiQC`](http://multiqc.info/))
 
 ### Seqtk/Sample

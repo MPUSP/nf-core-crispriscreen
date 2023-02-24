@@ -40,7 +40,7 @@ On release, automated continuous integration tests run the pipeline on a full-si
 8. Quantify gene fitness score from multiple targets per gene
    1. Option 1: Gene fitness is calculated using [`Mageck` MLE](https://sourceforge.net/p/mageck/wiki/Home/)
    2. Option 2: Gene fitness is calculated using [`DESeq2`](https://bioconductor.org/packages/release/bioc/html/DESeq2.html)
-9.  Generate HTML report with fitness results ([`R markdown`](https://nf-co.re/modules/rmarkdownnotebook))
+9. Generate HTML report with fitness results ([`R markdown`](https://nf-co.re/modules/rmarkdownnotebook))
 10. Present QC for raw and mapped reads ([`MultiQC`](http://multiqc.info/))
 
 ## Quick Start
@@ -110,13 +110,13 @@ The following scientific articles are related to this pipeline.
 THe new version of CRISPRi libary for which this Nextflow pipeline was developed:
 
 > Rui Miao, Michael Jahn, Kiyan Shabestary, Elton Paul Hudson.
-> *CRISPR interference screens reveal tradeoffs between growth rate and robustness in Synechocystis sp. PCC 6803 across trophic conditions*
+> _CRISPR interference screens reveal tradeoffs between growth rate and robustness in Synechocystis sp. PCC 6803 across trophic conditions_
 > bioRxiv 2023.02.13.528328. https://doi.org/10.1101/2023.02.13.528328
 
 THe original publication of the CRISPRi library for which a precursor of this pipeline was developed:
 
 > Lun Yao, Kiyan Shabestary, Sarah Björk, Johannes Asplund-Samuelsson, Hakan Joensson, Michael Jahn & Elton Paul Hudson.
-> *Pooled CRISPRi screening of the cyanobacterium Synechocystis sp PCC 6803 for enhanced industrial phenotypes*.
+> _Pooled CRISPRi screening of the cyanobacterium Synechocystis sp PCC 6803 for enhanced industrial phenotypes_.
 > Nature Communications, 11 (1666), 1–13. 2020. https://doi.org/10.1101/823534
 
 An extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
