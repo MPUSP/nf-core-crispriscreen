@@ -95,19 +95,11 @@ df_samplesheet <- df_samplesheet %>%
     filter(length(unique(time)) >= 2 || (time != 0 & group != reference_group)) %>%
     tibble::column_to_rownames("sample")
 
-df_counts <- list.files(path = getwd(), full.names = TRUE, pattern = ".featureCounts.txt$") %>%
-    lapply(function(x) {
-        df <- readr::read_tsv(x, col_types = cols(), skip = 1)
-        df <- tidyr::pivot_longer(df,
-            cols = matches("*.\\.bam$"),
-            names_to = "sample", values_to = "numreads"
-        )
-        df <- dplyr::mutate(df, sample = stringr::str_remove(sample, "\\_T[0-9]+\\.bam$"))
-        df
-    }) %>%
-    dplyr::bind_rows() %>%
-    dplyr::rename(sgRNA = Geneid) %>%
-    dplyr::select(sample, sgRNA, numreads)
+df_counts <- readr::read_tsv(path_counts, col_types = cols())
+df_counts <- tidyr::pivot_longer(df_counts,
+    cols = 3:ncol(df_counts),
+    names_to = "sample", values_to = "numreads"
+)
 
 # print overview information to console
 message("Number of sgRNAs detected in n samples:")
@@ -122,6 +114,7 @@ df_counts %>%
 # input data frame must be reshaped to a 'counts matrix' with genes as rows
 # and samples (conditions) as columns.
 counts <- df_counts %>%
+    dplyr::select(-Gene) %>%
     # spread condition over columns and sgRNAs over rows
     tidyr::pivot_wider(names_from = sample, values_from = numreads) %>%
     # remove sgRNA column, replace NA with 0
@@ -375,13 +368,6 @@ if (nrow(df_samplesheet) == 0) {
 # =====================
 #
 # Save result tables to output folder, in Rdata format
-message("Saving 'all_counts.tsv'")
-if (packageVersion("readr") %>% substr(0, 1) %>% as.numeric() >= 2) {
-    readr::write_tsv(df_counts, file = "all_counts.tsv")
-} else {
-    readr::write_tsv(df_counts, path = "all_counts.tsv")
-}
-
 if (nrow(df_samplesheet) > 0) {
     message("Saving 'result.Rdata'")
     save(DESeq_result_table, file = "result.Rdata")

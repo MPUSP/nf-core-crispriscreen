@@ -207,7 +207,7 @@ workflow CRISPRISCREEN {
     // MODULE: Calculate gene fitness from read counts using DESeq2
     //
     FITNESS (
-        ch_input, ch_featurecounts, params.normalization,
+        ch_input, PREPARE_COUNTS.out.all_counts, params.normalization,
         params.gene_fitness, params.gene_sep
     )
     ch_versions = ch_versions.mix(FITNESS.out.versions)
@@ -219,8 +219,9 @@ workflow CRISPRISCREEN {
         [ [ id:'counts_summary' ], file("$projectDir/bin/counts_summary.Rmd") ],
         [ [ id:'fitness_summary' ], file("$projectDir/bin/fitness_summary.Rmd") ]
     )
-    ch_fitness = FITNESS.out.allcounts
-    ch_fitness = ch_fitness.mix(FITNESS.out.rdata)
+
+    ch_fitness = FITNESS.out.rdata
+    ch_fitness = ch_fitness.mix(PREPARE_COUNTS.out.all_counts)
     ch_fitness = ch_fitness.collect()
 
     RMARKDOWNNOTEBOOK (

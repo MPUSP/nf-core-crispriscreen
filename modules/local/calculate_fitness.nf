@@ -12,7 +12,6 @@ process FITNESS {
     val gene_sep
 
     output:
-    path 'all_counts.tsv', emit: allcounts
     path 'result.Rdata', emit: rdata, optional:true
     path 'result.tsv', emit: tsv, optional:true
     path 'versions.yml', emit: versions
