@@ -11,6 +11,7 @@ process PREPARE_COUNTS {
     path samplesheet
     path counts
     val gene_sep
+    path input_design
 
     output:
     path 'design.tsv' , emit: design
@@ -23,7 +24,8 @@ process PREPARE_COUNTS {
     prepare_counts.R \
         "${samplesheet}" \
         "${counts}" \
-        "${gene_sep}"
+        "${gene_sep}" \
+        "${input_design}"
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

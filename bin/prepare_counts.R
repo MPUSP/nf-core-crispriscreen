@@ -16,6 +16,7 @@ args <- commandArgs(trailingOnly = TRUE)
 samplesheet <- args[1] # file path to sample sheet
 path_counts <- args[2] # file paths to count tables
 gene_sep <- args[3] # default: "|" aka the pipe symbol
+input_design <- args[4] # file path to custom design matrix, default: null
 
 
 ### PREPARE MASTER COUNT TABLE
@@ -59,19 +60,27 @@ write.table(
 
 ### PREPARE DESIGN MATRIX
 
+if (input_design == "\\|") {
 df_sample <- read.csv(samplesheet, stringsAsFactors = FALSE)
-df_design <- data.frame(
-    sample = df_sample[["sample"]],
-    baseline = 1,
-    time = df_sample[["time"]],
-    common = as.numeric(df_sample[["time"]] != 0)
-)
+    df_design <- data.frame(
+        sample = df_sample[["sample"]],
+        baseline = 1,
+        time = df_sample[["time"]],
+        common = as.numeric(df_sample[["time"]] != 0)
+    )
 
-# add 1 column for each condition/treatment with
-# binary encoding of samples that determine condition
-for (cond in unique(df_sample$condition)) {
-    df_design[[cond]] <- as.numeric(
-        (df_sample$condition %in% cond) & (df_sample$time != 0)
+    # add 1 column for each condition/treatment with
+    # binary encoding of samples that determine condition
+    for (cond in unique(df_sample$condition)) {
+        df_design[[cond]] <- as.numeric(
+            (df_sample$condition %in% cond) & (df_sample$time != 0)
+        )
+    }
+} else {
+    df_design <- read.delim(input_design,
+        stringsAsFactors = FALSE,
+        header = TRUE,
+        row.names = NULL
     )
 }
 

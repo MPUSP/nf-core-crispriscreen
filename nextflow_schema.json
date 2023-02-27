@@ -288,6 +288,13 @@
                     "description": "A string serving as regular expression to identify control barcodes/guide RNAs. It is matched against the target (gene) names in the fasta file. It is only used for p-value calculation using 2-sample Wilcoxon rank sum test. If omitted (the default), a 1-sample test is conducted",
                     "fa_icon": "fas fa-check-square",
                     "hidden": true
+                },
+                "design_matrix": {
+                    "type": "string",
+                    "description": "Optional path to a design matrix file for Mageck fitness calculation. This parameter expects a tab-separated values file with mandatory columns `sample`, `baseline`, and one column for each condition. For details, see [Mageck documentation](https://sourceforge.net/p/mageck/wiki/advanced_tutorial/#advanced-tutorials)",
+                    "default": null,
+                    "fa_icon": "fas fa-check-square",
+                    "hidden": true
                 }
             }
         },

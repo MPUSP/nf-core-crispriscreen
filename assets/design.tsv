@@ -1,0 +1,13 @@
+sample	baseline	time	common	example
+Example_S1_R1	1	0	0	0
+Example_S1_R2	1	0	0	0
+Example_S1_R3	1	0	0	0
+Example_S2_R1	1	4	1	1
+Example_S2_R2	1	4	1	1
+Example_S2_R3	1	4	1	1
+Example_S3_R1	1	8	1	1
+Example_S3_R2	1	8	1	1
+Example_S3_R3	1	8	1	1
+Example_S4_R1	1	10	1	1
+Example_S4_R2	1	10	1	1
+Example_S4_R3	1	10	1	1

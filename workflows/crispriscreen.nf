@@ -190,8 +190,14 @@ workflow CRISPRISCREEN {
     //
     // MODULE: Calculate gene fitness from read counts using Mageck
     //
+    if (params.design_matrix) {
+        ch_input_design = file(params.design_matrix, checkIfExists: true)
+    } else {
+        ch_input_design = file("|")
+    }
+
     PREPARE_COUNTS (
-        ch_input, ch_featurecounts, params.gene_sep
+        ch_input, ch_featurecounts, params.gene_sep, ch_input_design
     )
 
     ch_all_counts = PREPARE_COUNTS.out.all_counts
