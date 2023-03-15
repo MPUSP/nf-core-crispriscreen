@@ -80,7 +80,7 @@ if (normalization) {
 #
 # Step 1: Load sample layout sheet - file names must be row names
 df_samplesheet <- readr::read_csv(path_samplesheet, col_types = cols()) %>%
-    select(all_of(c("sample", "condition", "replicate", "date", "time", "group", "reference_group"))) %>%
+    select(all_of(c("sample", "condition", "replicate", "time", "group", "reference_group"))) %>%
     dplyr::mutate(group = factor(`group`))
 stopifnot(is.numeric(df_samplesheet$time))
 
@@ -188,7 +188,7 @@ if (nrow(df_samplesheet) == 0) {
     ) {
         df_samplesheet <- dplyr::bind_rows(
             df_samplesheet,
-            df_samplesheet %>% tidyr::complete(condition, tidyr::nesting(date, time)) %>%
+            df_samplesheet %>% tidyr::complete(condition, time) %>%
                 dplyr::filter(is.na(group), time == 0)
         )
     }
@@ -201,7 +201,7 @@ if (nrow(df_samplesheet) == 0) {
         dplyr::mutate(group = as.numeric(group)) %>%
         # complete missing combinations of variables, here mostly all log2FC
         # values (0) for the reference conditions
-        tidyr::complete(sgRNA, tidyr::nesting(condition, date, time, group, reference_group)) %>%
+        tidyr::complete(sgRNA, tidyr::nesting(condition, time, group, reference_group)) %>%
         dplyr::mutate(
             log2FoldChange = replace_na(log2FoldChange, 0),
             lfcSE = replace_na(lfcSE, 0),

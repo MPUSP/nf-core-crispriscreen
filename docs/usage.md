@@ -8,13 +8,13 @@
 
 ## Introduction
 
-The pipeline processes (Illumina) next generation sequencing data obtained from CRISPRi repression library screenings. It can also used for other types of screenings as long as the input data is similar, that is, short PCR-amplified reads containing some sort of barcodes. The pipeline requires as little as three input types:
+The pipeline processes (Illumina) next generation sequencing data obtained from CRISPRi repression library screenings. It can also be used for other types of screenings as long as the input data is similar, that is, short PCR-amplified reads containing some sort of barcodes. The pipeline requires as little as three input types:
 
 - Sequencing data in `*.fastq.gz` format
 - The `samplesheet.csv` describing samples. See following section for details.
 - A reference 'library' in `*.fasta` format
 
-The results of running the pipeline are described in detail at [output](output.md).
+The results of the pipeline are described in detail in the [output](output.md) section.
 
 ## Samplesheet input
 
@@ -39,16 +39,16 @@ CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz
 
 The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet can have as many columns as you desire, however, there is a strict requirement for the first 3 columns to match those defined in the table below.
 
-A full samplesheet consisting of single-end data may look something like the one below. This is for 6 samples, 3 replicates each for two different time points of the same condition/treatment. In addition to a regular `samplesheet.csv`, the sheet for the `crispriscreen` pipeline takes the input columns `condition`, `replicate` , `date`, `time`, `group`, and `reference_group`. These columns are meta data describing the experimental design. This information is then used to calculate fitness scores which are a function of (generation) time. Each time point makes up one `group` and is compared to the `reference_group`, usually the zero time point of the same condition/treatment. If the additional columns are missing or incomplete, fitness score calculation is omitted but the pipeline will still be able to run. In this case the final output are read count tables from the `subread/featureCounts` module instead of fitness scores.
+A full samplesheet describing single-end sequencing data may look something like the one below. This is for 6 samples, 3 replicates each for two different time points of the same condition/treatment. In addition to a regular `samplesheet.csv`, the sheet for the `crispriscreen` pipeline takes the input columns `condition`, `replicate` , `time`, `group`, and `reference_group`. These columns are meta data describing the experimental design. This information is then used to calculate fitness scores which are a function of (generation) time. Each time point makes up one `group` and is compared to the `reference_group`, usually the zero time point of the same condition/treatment. If the additional columns are missing or incomplete, fitness score calculation is omitted but the pipeline will still be able to run. In this case the final output are read count tables from the `subread/featureCounts` module instead of fitness scores.
 
 ```console
-sample,fastq_1,fastq_2,condition,replicate,date,time,group,reference_group
-Example_S1_R1,./test/fastq/Example_S1_R1.fastq.gz,,example,1,2021_01_09,0,1,1
-Example_S1_R2,./test/fastq/Example_S1_R2.fastq.gz,,example,2,2021_01_09,0,1,1
-Example_S1_R3,./test/fastq/Example_S1_R3.fastq.gz,,example,3,2021_01_09,0,1,1
-Example_S2_R1,./test/fastq/Example_S2_R1.fastq.gz,,example,1,2021_01_09,4,2,1
-Example_S2_R2,./test/fastq/Example_S2_R2.fastq.gz,,example,2,2021_01_09,4,2,1
-Example_S2_R3,./test/fastq/Example_S2_R3.fastq.gz,,example,3,2021_01_09,4,2,1
+sample,fastq_1,fastq_2,condition,replicate,time,group,reference_group
+Example_S1_R1,./test/fastq/Example_S1_R1.fastq.gz,,example,1,0,1,1
+Example_S1_R2,./test/fastq/Example_S1_R2.fastq.gz,,example,2,0,1,1
+Example_S1_R3,./test/fastq/Example_S1_R3.fastq.gz,,example,3,0,1,1
+Example_S2_R1,./test/fastq/Example_S2_R1.fastq.gz,,example,1,4,2,1
+Example_S2_R2,./test/fastq/Example_S2_R2.fastq.gz,,example,2,4,2,1
+Example_S2_R3,./test/fastq/Example_S2_R3.fastq.gz,,example,3,4,2,1
 ```
 
 | Column            | Description                                                                                                                         |

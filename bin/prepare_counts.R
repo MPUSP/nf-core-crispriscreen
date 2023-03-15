@@ -61,7 +61,7 @@ write.table(
 ### PREPARE DESIGN MATRIX
 
 if (input_design == "\\|") {
-df_sample <- read.csv(samplesheet, stringsAsFactors = FALSE)
+    df_sample <- read.csv(samplesheet, stringsAsFactors = FALSE)
     df_design <- data.frame(
         sample = df_sample[["sample"]],
         baseline = 1,
