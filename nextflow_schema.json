@@ -289,6 +289,13 @@
                     "fa_icon": "fas fa-check-square",
                     "hidden": true
                 },
+                "run_mageck": {
+                    "type": "boolean",
+                    "description": "Whether to run Mageck MLE for fitness calculation. For details, see [Mageck documentation](https://sourceforge.net/p/mageck/wiki/advanced_tutorial/#advanced-tutorials)",
+                    "default": true,
+                    "fa_icon": "fas fa-check-square",
+                    "hidden": true
+                },
                 "design_matrix": {
                     "type": "string",
                     "description": "Optional path to a design matrix file for Mageck fitness calculation. This parameter expects a tab-separated values file with mandatory columns `sample`, `baseline`, and one column for each condition. For details, see [Mageck documentation](https://sourceforge.net/p/mageck/wiki/advanced_tutorial/#advanced-tutorials)",

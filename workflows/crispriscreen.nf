@@ -203,12 +203,13 @@ workflow CRISPRISCREEN {
     ch_all_counts = PREPARE_COUNTS.out.all_counts
         .map { [ [ id: "all_counts" ], it ] }
 
-    MAGECK_MLE (
-        ch_all_counts,
-        PREPARE_COUNTS.out.design
-    )
-    ch_versions = ch_versions.mix(MAGECK_MLE.out.versions)
-
+    if (params.run_mageck) {
+        MAGECK_MLE (
+            ch_all_counts,
+            PREPARE_COUNTS.out.design
+        )
+        ch_versions = ch_versions.mix(MAGECK_MLE.out.versions)
+    }
     //
     // MODULE: Calculate gene fitness from read counts using DESeq2
     //
