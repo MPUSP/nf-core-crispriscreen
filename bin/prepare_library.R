@@ -17,9 +17,35 @@ gene_controls <- args[2] # pattern for control barcodes, default: "" aka empty s
 
 # read and process fasta file
 fasta_df <- read.delim(fasta_file, header = FALSE)
+## identify lines which start with ">" - if there are none, raise error (then probably no .fasta file!) - catch cases in which nucleotide sequence is spread over several lines
+number_headers <- sum(grepl(">", fasta_df[,1]))
+stopifnot(!number_headers==0)
+header_vec <- 1:number_headers
+nt_seq_vec <- 1:number_headers
+tmp_nt_seq <- ""
+counter_headers <- 1
+for(line_i in 1:nrow(fasta_df)){
+  if(grepl(">", fasta_df[line_i,])){
+    if(counter_headers == 1){
+      header_vec[counter_headers] <- fasta_df[line_i,]
+      counter_headers = counter_headers + 1
+    } else {
+      nt_seq_vec[counter_headers-1] <- tmp_nt_seq
+      header_vec[counter_headers] <- fasta_df[line_i,]
+      counter_headers = counter_headers + 1
+    }
+    tmp_nt_seq = ""
+  } else {
+    tmp_nt_seq <- paste(tmp_nt_seq, trimws(fasta_df[line_i,]), sep="")
+  }
+  if(line_i == nrow(fasta_df)){
+    nt_seq_vec[counter_headers-1] <- tmp_nt_seq
+  }
+}
+
 saf_df <- data.frame(
-    GeneID = fasta_df[seq(1, nrow(fasta_df), 2), 1],
-    Sequence = fasta_df[seq(2, nrow(fasta_df), 2), 1]
+    GeneID = header_vec,
+    Sequence = nt_seq_vec
 )
 
 # check for duplications
@@ -34,7 +60,12 @@ saf_df$End <- sapply(saf_df$Sequence, nchar)
 saf_df$Strand <- "*"
 saf_df <- saf_df[c("GeneID", "Chr", "Start", "End", "Strand", "Sequence")]
 
-saf_name <- gsub("fasta$", "saf", basename(fasta_file))
+# replace file ending by .saf (everything after last . in file name is interpreted as file ending) - if there is no file ending, append ".saf"
+if (length(strsplit(fasta_file, "\\.")[[1]][-1]) > 0) {
+  saf_name <- gsub(strsplit(fasta_file, "\\.")[[1]][-1], "saf", basename(fasta_file))
+  } else {
+  saf_name <- paste(fasta_file, ".saf", sep="")
+}
 write.table(
     x = saf_df, file = saf_name, sep = "\t", row.names = FALSE,
     col.names = FALSE, quote = FALSE
@@ -53,3 +84,4 @@ if (gene_controls != "") {
         col.names = FALSE, quote = FALSE
     )
 }
+
