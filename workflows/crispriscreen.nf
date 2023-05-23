@@ -222,14 +222,17 @@ workflow CRISPRISCREEN {
     //
     // MODULE: R markdown rendering the final fitness reports
     //
-    ch_rmdtemplates = Channel.of(
-        [ [ id:'counts_summary' ], file("$projectDir/bin/counts_summary.Rmd") ]
-    )
+    rmd_templ_counts = [ [ id:'counts_summary' ], file("$projectDir/bin/counts_summary.Rmd") ]
+    rmd_templ_fitness = [ [ id:'fitness_summary' ], file("$projectDir/bin/fitness_summary.Rmd") ]
     if (params.gene_fitness) {
-        ch_rmdtemplates = ch_rmdtemplates.mix(
-            [ [ id:'fitness_summary' ], file("$projectDir/bin/fitness_summary.Rmd") ]
+        ch_rmdtemplates = Channel.of(
+            rmd_templ_counts, rmd_templ_fitness
         )
-    }
+    } else [
+        ch_rmdtemplates = Channel.of(
+            rmd_templ_counts
+        )
+    ]
 
     ch_fitness = FITNESS.out.rdata
     ch_fitness = ch_fitness.mix(PREPARE_COUNTS.out.all_counts)
