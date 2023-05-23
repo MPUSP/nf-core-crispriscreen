@@ -23,11 +23,11 @@ knitr::opts_chunk$set(echo = FALSE)
 
 # Requirements
 
-- if not all dependencies are satisfied by R environment, try to install additional libraries `dplyr`, `ggplot2`, `tidyr`, `Hmics`, `DescTools`
+- if not all dependencies are satisfied by R environment, try to install additional libraries `dplyr`, `ggplot2`, `tidyr`, `Hmisc`
 - loading libraries
 
 ```{r}
-list_req_packages <- c("dplyr", "ggplot2", "tidyr", "Hmisc", "DescTools")
+list_req_packages <- c("dplyr", "ggplot2", "tidyr", "Hmisc")
 list_to_install <- setdiff(list_req_packages, rownames(installed.packages()))
 
 if (length(list_to_install)) {
@@ -277,9 +277,12 @@ df_auc %>%
 ```
 
 ```{r, warning = FALSE}
+calc_auc <- function(x, y) {
+    sum(diff(x) * (head(y, -1) + tail(y, -1))) / 2
+}
 df_auc %>%
     dplyr::summarize(
-        auc = DescTools::AUC(pc_barcodes, pc_reads),
+        auc = calc_auc(pc_barcodes, pc_reads),
         gini = (auc - 5000) / 5000
     ) %>%
     mutate(quality = case_when(

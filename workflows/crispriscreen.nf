@@ -203,7 +203,7 @@ workflow CRISPRISCREEN {
     ch_all_counts = PREPARE_COUNTS.out.all_counts
         .map { [ [ id: "all_counts" ], it ] }
 
-    if (params.run_mageck) {
+    if (params.run_mageck & params.gene_fitness) {
         MAGECK_MLE (
             ch_all_counts,
             PREPARE_COUNTS.out.design
@@ -223,9 +223,13 @@ workflow CRISPRISCREEN {
     // MODULE: R markdown rendering the final fitness reports
     //
     ch_rmdtemplates = Channel.of(
-        [ [ id:'counts_summary' ], file("$projectDir/bin/counts_summary.Rmd") ],
-        [ [ id:'fitness_summary' ], file("$projectDir/bin/fitness_summary.Rmd") ]
+        [ [ id:'counts_summary' ], file("$projectDir/bin/counts_summary.Rmd") ]
     )
+    if (params.gene_fitness) {
+        ch_rmdtemplates = ch_rmdtemplates.mix(
+            [ [ id:'fitness_summary' ], file("$projectDir/bin/fitness_summary.Rmd") ]
+        )
+    }
 
     ch_fitness = FITNESS.out.rdata
     ch_fitness = ch_fitness.mix(PREPARE_COUNTS.out.all_counts)
