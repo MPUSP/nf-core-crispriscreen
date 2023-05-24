@@ -2,7 +2,7 @@ process FITNESS {
     tag "$samplesheet"
     label "process_high"
 
-    conda (params.enable_conda ? "conda-forge::r-base=4.2.2 conda-forge::r-tidyverse=1.3.2 bioconda::bioconductor-deseq2=1.38.0 bioconda::bioconductor-biocparallel=1.32.0 bioconda::bioconductor-limma=3.54.0" : null)
+    conda "conda-forge::r-base=4.2.2 conda-forge::r-tidyverse=1.3.2 bioconda::bioconductor-deseq2=1.38.0 bioconda::bioconductor-biocparallel=1.32.5 bioconda::bioconductor-limma=3.54.0"
 
     input:
     path samplesheet
@@ -15,6 +15,9 @@ process FITNESS {
     path 'result.Rdata', emit: rdata, optional:true
     path 'result.tsv', emit: tsv, optional:true
     path 'versions.yml', emit: versions
+
+    when:
+    task.ext.when == null || task.ext.when
 
     script: // This script is bundled with the pipeline, in nf-core/crispriscreen/bin/
     def args = task.ext.args ?: ''
