@@ -210,6 +210,7 @@ workflow CRISPRISCREEN {
         )
         ch_versions = ch_versions.mix(MAGECK_MLE.out.versions)
     }
+
     //
     // MODULE: Calculate gene fitness from read counts using DESeq2
     //

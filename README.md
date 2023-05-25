@@ -95,7 +95,10 @@ The nf-core/crispriscreen pipeline comes with documentation about the pipeline [
 
 ## Credits
 
-nf-core/crispriscreen was originally written by Michael Jahn.
+The following people contributed to the nf-core/crispriscreen pipeline:
+
+- Dr. Michael Jahn, MPUSP Berlin ([ORCID](https://orcid.org/0000-0002-3913-153X)) - main author and maintainer
+- Dr. Ute Hoffmann, Science for Life Lab, Stockholm - contributor
 
 ## Contributions and Support
 
@@ -107,13 +110,13 @@ For further information or help, don't hesitate to get in touch on the [Slack `#
 
 The following scientific articles are related to this pipeline.
 
-THe new version of CRISPRi libary for which this Nextflow pipeline was developed:
+The new version of CRISPRi libary for which this Nextflow pipeline was developed:
 
 > Rui Miao, Michael Jahn, Kiyan Shabestary, Elton Paul Hudson.
 > _CRISPR interference screens reveal tradeoffs between growth rate and robustness in Synechocystis sp. PCC 6803 across trophic conditions_
 > bioRxiv 2023.02.13.528328. https://doi.org/10.1101/2023.02.13.528328
 
-THe original publication of the CRISPRi library for which a precursor of this pipeline was developed:
+The original publication of the CRISPRi library for which a precursor of this pipeline was developed:
 
 > Lun Yao, Kiyan Shabestary, Sarah Björk, Johannes Asplund-Samuelsson, Hakan Joensson, Michael Jahn & Elton Paul Hudson.
 > _Pooled CRISPRi screening of the cyanobacterium Synechocystis sp PCC 6803 for enhanced industrial phenotypes_.
