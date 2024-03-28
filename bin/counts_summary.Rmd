@@ -149,7 +149,7 @@ custom_theme <- function(base_size = 12, base_line_size = 1.0, base_rect_size = 
 
 ## Total number of mapped reads per sample
 
-```{r, out.width="100%", out.height="100%", warning = FALSE}
+```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE}
 df_counts %>%
     dplyr::group_by(sample) %>%
     dplyr::summarize(n_reads = sum(n_reads)) %>%
@@ -162,7 +162,7 @@ df_counts %>%
 
 ## Number of individual barcodes per sample
 
-```{r, out.width="100%", out.height="100%", warning = FALSE}
+```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE}
 df_counts %>%
     dplyr::group_by(sample) %>%
     dplyr::summarize(`unique barcodes per sample` = sum(n_reads > 0)) %>%
@@ -175,7 +175,7 @@ df_counts %>%
 
 ## Number of missing barcodes per sample
 
-```{r, out.width="100%", out.height="100%", warning = FALSE}
+```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE}
 df_counts %>%
     dplyr::group_by(sample) %>%
     dplyr::summarize(`missing barcodes per sample` = sum(n_reads == 0)) %>%
@@ -188,7 +188,7 @@ df_counts %>%
 
 ## Number of barcodes per gene, per sample
 
-```{r, out.width="100%", out.height="100%", warning = FALSE}
+```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE}
 df_counts %>%
     dplyr::group_by(sample, Gene) %>%
     dplyr::summarize(`unique barcodes` = length(unique(sgRNA))) %>%
@@ -208,7 +208,7 @@ df_counts %>%
 
 ## Read count distribution, per sample (capped at 1000 barcodes)
 
-```{r, out.width="100%", out.height="100%", warning = FALSE}
+```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE}
 df_counts %>%
     dplyr::group_by(sample) %>%
     dplyr::slice(1:1000) %>%
@@ -224,7 +224,7 @@ df_counts %>%
 
 ## Number of reads per barcode, per sample
 
-```{r, out.width="100%", out.height="100%", warning = FALSE}
+```{r, fig.width = figwidth, fig.height = figheight2, warning = FALSE}
 df_counts %>%
     ggplot(aes(x = log2(n_reads))) +
     geom_histogram(fill = custom_colors[1], alpha = 0.7, bins = 30) +
@@ -235,7 +235,7 @@ df_counts %>%
 
 ## Top 10 most abundant barcodes, per sample
 
-```{r, out.width="100%", out.height="100%", warning = FALSE}
+```{r, fig.width = figwidth, fig.height = figheight2, warning = FALSE}
 df_counts %>%
     dplyr::group_by(sample) %>%
     dplyr::arrange(sample, desc(n_reads)) %>%
@@ -250,7 +250,7 @@ df_counts %>%
 
 ## Cumulative read count distribution and population equality
 
-```{r, out.width="100%", out.height="100%", warning = FALSE}
+```{r, fig.width = figwidth, fig.height = figheight2, warning = FALSE}
 df_auc <- df_counts %>%
     dplyr::arrange(sample, desc(n_reads)) %>%
     dplyr::group_by(sample) %>%
@@ -340,7 +340,7 @@ df_PCA %>%
         title = "PCA, first three principal components",
         subtitle = "Point size encodes PC3", x = "PC1", y = "PC2"
     ) +
-    custom_theme(legend.position = "none") +
+    custom_theme(legend.position = "none", aspect.ratio = 1) +
     scale_color_manual(values = colorRampPalette(custom_colors)(nrow(df_PCA))) +
     guides(size = "none")
 ```
