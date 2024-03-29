@@ -203,7 +203,7 @@ df_counts %>%
     labs(x = "") +
     coord_flip() +
     scale_fill_manual(values = colorRampPalette(custom_colors[1:5])(9)) +
-    custom_theme(legend.position = 0)
+    custom_theme(legend.position = "none")
 ```
 
 ## Read count distribution, per sample (capped at 1000 barcodes)
@@ -340,7 +340,7 @@ df_PCA %>%
         title = "PCA, first three principal components",
         subtitle = "Point size encodes PC3", x = "PC1", y = "PC2"
     ) +
-    custom_theme(legend.position = 0, aspect = 1) +
+    custom_theme(legend.position = "none", aspect.ratio = 1) +
     scale_color_manual(values = colorRampPalette(custom_colors)(nrow(df_PCA))) +
     guides(size = "none")
 ```
