@@ -3,18 +3,18 @@ title: "Read counts summary"
 author: "SYSTEM: `r version[13]`"
 date: "DATE: `r Sys.time()`"
 params:
-  cpus: 2
-  artifact_dir: artifacts
-  input_dir: ./
-  meta: ""
+    cpus: 2
+    artifact_dir: artifacts
+    input_dir: ./
+    meta: ""
 output:
-  html_notebook:
-    theme: cosmo
-    toc: yes
-    number_sections: yes
-  html_document:
-    toc: yes
-    df_print: paged
+    html_notebook:
+        theme: cosmo
+        toc: yes
+        number_sections: yes
+    html_document:
+        toc: yes
+        df_print: paged
 ---
 
 ```{r setup, include = FALSE}
@@ -355,8 +355,8 @@ Author: Michael Jahn, PhD
 
 Affilations:
 
-  - Science For Life Laboratory (KTH), Stockholm, Sweden
-  - Max-Planck-Unit for the Science of Pathogens, Berlin, Germany
+- Science For Life Laboratory (KTH), Stockholm, Sweden
+- Max-Planck-Unit for the Science of Pathogens, Berlin, Germany
 
 # Session Info
 

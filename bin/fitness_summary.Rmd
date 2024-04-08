@@ -3,18 +3,18 @@ title: "Fitness summary"
 author: "SYSTEM: `r version[13]`"
 date: "DATE: `r Sys.time()`"
 params:
-  cpus: 2
-  artifact_dir: artifacts
-  input_dir: ./
-  meta: ""
+    cpus: 2
+    artifact_dir: artifacts
+    input_dir: ./
+    meta: ""
 output:
-  html_notebook:
-    theme: cosmo
-    toc: yes
-    number_sections: yes
-  html_document:
-    toc: yes
-    df_print: paged
+    html_notebook:
+        theme: cosmo
+        toc: yes
+        number_sections: yes
+    html_document:
+        toc: yes
+        df_print: paged
 ---
 
 ```{r setup, include = FALSE}
@@ -30,20 +30,20 @@ list_req_packages <- c("dplyr", "ggplot2", "gridExtra")
 list_to_install <- setdiff(list_req_packages, rownames(installed.packages()))
 
 if (length(list_to_install)) {
-  # add library dir for additional packages
-  homedir <- system("echo ${HOME}", intern = TRUE)
-  libdir <- .libPaths()
-  if (any(grepl(homedir, libdir))) {
-    pkdir <- grep(homedir, libdir, value = TRUE)
-  } else {
-    pkdir <- paste0(homedir, "/.R")
-    system(paste0("mkdir ", pkdir))
-    .libPaths(new = pkdir)
-  }
-  install.packages(pkgs = list_to_install, lib = pkdir)
-  print(paste0("Missing package(s) ", paste(list_to_install, collapse = ", "), " are installed to '", pkdir, "'."))
+    # add library dir for additional packages
+    homedir <- system("echo ${HOME}", intern = TRUE)
+    libdir <- .libPaths()
+    if (any(grepl(homedir, libdir))) {
+        pkdir <- grep(homedir, libdir, value = TRUE)
+    } else {
+        pkdir <- paste0(homedir, "/.R")
+        system(paste0("mkdir ", pkdir))
+        .libPaths(new = pkdir)
+    }
+    install.packages(pkgs = list_to_install, lib = pkdir)
+    print(paste0("Missing package(s) ", paste(list_to_install, collapse = ", "), " are installed to '", pkdir, "'."))
 } else {
-  print(paste0("Required package(s) ", paste(list_req_packages, collapse = ", "), " are already installed."))
+    print(paste0("Required package(s) ", paste(list_req_packages, collapse = ", "), " are already installed."))
 }
 ```
 
@@ -51,9 +51,9 @@ if (length(list_to_install)) {
 
 ```{r}
 suppressPackageStartupMessages({
-  for (pkg in list_req_packages) {
-    library(pkg, character.only = TRUE)
-  }
+    for (pkg in list_req_packages) {
+        library(pkg, character.only = TRUE)
+    }
 })
 print(paste0("Required package(s) ", paste(list_req_packages, collapse = ", "), " are loaded."))
 ```
@@ -72,20 +72,20 @@ input_pattern <- "result.Rdata"
 # check input files and compile small table
 input_files <- grep(list.files(wd), pattern = input_pattern, value = TRUE)
 if (length(input_files) == 1) {
-  df_input <- bind_cols(
-    data.frame(input_files),
-    file.info(paste(wd, input_files, sep = "/"))
-  ) %>%
-    mutate(size = paste(size / 1e6, "MB"))
-  rownames(df_input) <- NULL
-  df_input[c(1, 2, 3, 4, 5, 10)]
-  eval_chunks <- TRUE
+    df_input <- bind_cols(
+        data.frame(input_files),
+        file.info(paste(wd, input_files, sep = "/"))
+    ) %>%
+        mutate(size = paste(size / 1e6, "MB"))
+    rownames(df_input) <- NULL
+    df_input[c(1, 2, 3, 4, 5, 10)]
+    eval_chunks <- TRUE
 } else {
-  print(paste0("Required input file(s) '", input_pattern, "' were not found."))
-  print("Further processing of the analysis is omitted.")
-  eval_chunks <- FALSE
-  figwidth <- 6
-  figheight <- 6
+    print(paste0("Required input file(s) '", input_pattern, "' were not found."))
+    print("Further processing of the analysis is omitted.")
+    eval_chunks <- FALSE
+    figwidth <- 6
+    figheight <- 6
 }
 ```
 
@@ -107,13 +107,13 @@ figheight <- round(2 + (length(list_conditions)))
 
 # output sample table
 DESeq_result_table %>%
-  group_by(condition, time) %>%
-  summarize(
-    .groups = "drop",
-    barcodes = length(unique(sgRNA)),
-    DESeq_baseMean = mean(baseMean, na.rm = TRUE),
-    DESeq_log2FC = mean(log2FoldChange, na.rm = TRUE),
-  )
+    group_by(condition, time) %>%
+    summarize(
+        .groups = "drop",
+        barcodes = length(unique(sgRNA)),
+        DESeq_baseMean = mean(baseMean, na.rm = TRUE),
+        DESeq_log2FC = mean(log2FoldChange, na.rm = TRUE),
+    )
 ```
 
 
@@ -122,28 +122,28 @@ DESeq_result_table %>%
 # custom ggplot2 theme that is reused for all later plots
 custom_colors <- c("#E7298A", "#66A61E", "#E6AB02", "#7570B3", "#B3B3B3", "#1B9E77", "#D95F02", "#A6761D")
 custom_range <- function(n = 5) {
-  colorRampPalette(custom_colors[c(1, 5, 2)])(n)
+    colorRampPalette(custom_colors[c(1, 5, 2)])(n)
 }
 
 custom_theme <- function(base_size = 12, base_line_size = 1.0, base_rect_size = 1.0, ...) {
-  theme_light(base_size = base_size, base_line_size = base_line_size, base_rect_size = base_rect_size) + theme(
-    title = element_text(colour = grey(0.4), size = 10),
-    plot.margin = unit(c(12, 12, 12, 12), "points"),
-    axis.ticks.length = unit(0.2, "cm"),
-    axis.ticks = element_line(colour = grey(0.4), linetype = "solid", lineend = "round"),
-    axis.text.x = element_text(colour = grey(0.4), size = 10),
-    axis.text.y = element_text(colour = grey(0.4), size = 10),
-    panel.grid.major = element_line(size = 0.6, linetype = "solid", colour = grey(0.9)),
-    panel.grid.minor = element_blank(),
-    panel.border = element_rect(linetype = "solid", colour = grey(0.4), fill = NA, size = 1.0),
-    panel.background = element_blank(),
-    strip.background = element_blank(),
-    strip.text = element_text(colour = grey(0.4), size = 10, margin = unit(rep(3, 4), "points")),
-    legend.text = element_text(colour = grey(0.4), size = 10),
-    legend.title = element_blank(),
-    legend.background = element_blank(),
-    ...
-  )
+    theme_light(base_size = base_size, base_line_size = base_line_size, base_rect_size = base_rect_size) + theme(
+        title = element_text(colour = grey(0.4), size = 10),
+        plot.margin = unit(c(12, 12, 12, 12), "points"),
+        axis.ticks.length = unit(0.2, "cm"),
+        axis.ticks = element_line(colour = grey(0.4), linetype = "solid", lineend = "round"),
+        axis.text.x = element_text(colour = grey(0.4), size = 10),
+        axis.text.y = element_text(colour = grey(0.4), size = 10),
+        panel.grid.major = element_line(size = 0.6, linetype = "solid", colour = grey(0.9)),
+        panel.grid.minor = element_blank(),
+        panel.border = element_rect(linetype = "solid", colour = grey(0.4), fill = NA, size = 1.0),
+        panel.background = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(colour = grey(0.4), size = 10, margin = unit(rep(3, 4), "points")),
+        legend.text = element_text(colour = grey(0.4), size = 10),
+        legend.title = element_blank(),
+        legend.background = element_blank(),
+        ...
+    )
 }
 ```
 
@@ -158,50 +158,50 @@ custom_theme <- function(base_size = 12, base_line_size = 1.0, base_rect_size = 
 
 ```{r, fig.width = figwidth, fig.height = 4.5, warning = FALSE, eval = eval_chunks}
 plot_sgRNA_correlation <- DESeq_result_table %>%
-  select(sgRNA_target, sgRNA_index, sgRNA_correlation, condition, time) %>%
-  distinct() %>%
-  # filter indices that have lower frequency than 3%
-  group_by(sgRNA_index) %>%
-  mutate(n_obs = n()) %>%
-  ungroup() %>%
-  filter(n_obs >= n() * 0.03) %>%
-  # plot
-  ggplot(aes(x = factor(sgRNA_index), y = sgRNA_correlation)) +
-  geom_boxplot(outlier.shape = "") +
-  labs(x = "barcode position", y = "correlation") +
-  stat_summary(fun.data = function(x) {
-    c(
-      y = median(x) + 0.07,
-      label = round(median(x), 2)
-    )
-  }, geom = "text", size = 3) +
-  stat_summary(fun.data = function(x) {
-    c(
-      y = 1.1,
-      label = length(x)
-    )
-  }, geom = "text", color = grey(0.5), size = 3) +
-  coord_cartesian(ylim = c(-0.15, 1.15)) +
-  custom_theme()
+    select(sgRNA_target, sgRNA_index, sgRNA_correlation, condition, time) %>%
+    distinct() %>%
+    # filter indices that have lower frequency than 3%
+    group_by(sgRNA_index) %>%
+    mutate(n_obs = n()) %>%
+    ungroup() %>%
+    filter(n_obs >= n() * 0.03) %>%
+    # plot
+    ggplot(aes(x = factor(sgRNA_index), y = sgRNA_correlation)) +
+    geom_boxplot(outlier.shape = "") +
+    labs(x = "barcode position", y = "correlation") +
+    stat_summary(fun.data = function(x) {
+        c(
+            y = median(x) + 0.07,
+            label = round(median(x), 2)
+        )
+    }, geom = "text", size = 3) +
+    stat_summary(fun.data = function(x) {
+        c(
+            y = 1.1,
+            label = length(x)
+        )
+    }, geom = "text", color = grey(0.5), size = 3) +
+    coord_cartesian(ylim = c(-0.15, 1.15)) +
+    custom_theme()
 
 plot_sgRNA_correlation_hist <- DESeq_result_table %>%
-  select(sgRNA_target, sgRNA_index, sgRNA_correlation, condition, time) %>%
-  # filter indices that have lower frequency than 3%
-  group_by(sgRNA_index) %>%
-  mutate(n_obs = n()) %>%
-  ungroup() %>%
-  filter(n_obs >= n() * 0.03) %>%
-  distinct() %>%
-  group_by(sgRNA_target) %>%
-  summarize(
-    median_sgRNA_correlation = median(sgRNA_correlation),
-    min_sgRNA_correlation = min(sgRNA_correlation)
-  ) %>%
-  # plot
-  ggplot(aes(x = median_sgRNA_correlation)) +
-  geom_histogram(bins = 40, fill = custom_colors[1], alpha = 0.7) +
-  labs(x = "median barcode correlation", y = "count") +
-  custom_theme()
+    select(sgRNA_target, sgRNA_index, sgRNA_correlation, condition, time) %>%
+    # filter indices that have lower frequency than 3%
+    group_by(sgRNA_index) %>%
+    mutate(n_obs = n()) %>%
+    ungroup() %>%
+    filter(n_obs >= n() * 0.03) %>%
+    distinct() %>%
+    group_by(sgRNA_target) %>%
+    summarize(
+        median_sgRNA_correlation = median(sgRNA_correlation),
+        min_sgRNA_correlation = min(sgRNA_correlation)
+    ) %>%
+    # plot
+    ggplot(aes(x = median_sgRNA_correlation)) +
+    geom_histogram(bins = 40, fill = custom_colors[1], alpha = 0.7) +
+    labs(x = "median barcode correlation", y = "count") +
+    custom_theme()
 
 plot_sgRNA_correlation
 plot_sgRNA_correlation_hist
@@ -216,47 +216,47 @@ plot_sgRNA_correlation_hist
 
 ```{r, fig.width = figwidth, fig.height = 4.5, warning = FALSE, eval = eval_chunks}
 plot_sgRNA_efficiency <- DESeq_result_table %>%
-  # filter indices that have lower frequency than 3%
-  group_by(sgRNA_index) %>%
-  mutate(n_obs = n()) %>%
-  ungroup() %>%
-  filter(n_obs >= n() * 0.03) %>%
-  select(sgRNA_target, sgRNA_index, sgRNA_efficiency) %>%
-  distinct() %>%
-  ggplot(aes(x = factor(sgRNA_index), y = sgRNA_efficiency)) +
-  geom_boxplot(notch = FALSE, outlier.shape = ".") +
-  labs(x = "barcode position (relative)", y = "repression efficiency") +
-  coord_cartesian(ylim = c(-0.15, 1.15)) +
-  stat_summary(fun.data = function(x) {
-    c(
-      y = median(x) + 0.07,
-      label = round(median(x), 2)
-    )
-  }, geom = "text", size = 3) +
-  stat_summary(fun.data = function(x) {
-    c(
-      y = 1.1,
-      label = length(x)
-    )
-  }, geom = "text", color = grey(0.5), size = 3) +
-  custom_theme()
+    # filter indices that have lower frequency than 3%
+    group_by(sgRNA_index) %>%
+    mutate(n_obs = n()) %>%
+    ungroup() %>%
+    filter(n_obs >= n() * 0.03) %>%
+    select(sgRNA_target, sgRNA_index, sgRNA_efficiency) %>%
+    distinct() %>%
+    ggplot(aes(x = factor(sgRNA_index), y = sgRNA_efficiency)) +
+    geom_boxplot(notch = FALSE, outlier.shape = ".") +
+    labs(x = "barcode position (relative)", y = "repression efficiency") +
+    coord_cartesian(ylim = c(-0.15, 1.15)) +
+    stat_summary(fun.data = function(x) {
+        c(
+            y = median(x) + 0.07,
+            label = round(median(x), 2)
+        )
+    }, geom = "text", size = 3) +
+    stat_summary(fun.data = function(x) {
+        c(
+            y = 1.1,
+            label = length(x)
+        )
+    }, geom = "text", color = grey(0.5), size = 3) +
+    custom_theme()
 
 plot_sgRNA_efficiency_hist <- DESeq_result_table %>%
-  # filter indices that have lower frequency than 3%
-  group_by(sgRNA_index) %>%
-  mutate(n_obs = n()) %>%
-  ungroup() %>%
-  filter(n_obs >= n() * 0.03) %>%
-  select(sgRNA_target, sgRNA_position, sgRNA_efficiency) %>%
-  distinct() %>%
-  group_by(sgRNA_position) %>%
-  summarize(sgRNA_efficiency = median(sgRNA_efficiency), n_pos = n()) %>%
-  filter(n_pos >= 10) %>%
-  ggplot(aes(x = sgRNA_position, y = sgRNA_efficiency)) +
-  labs(x = "barcode position (nt)", y = "repression efficiency") +
-  geom_point(col = alpha(custom_colors[5], 0.5)) +
-  geom_smooth(formula = "y ~ x", method = "loess") +
-  custom_theme()
+    # filter indices that have lower frequency than 3%
+    group_by(sgRNA_index) %>%
+    mutate(n_obs = n()) %>%
+    ungroup() %>%
+    filter(n_obs >= n() * 0.03) %>%
+    select(sgRNA_target, sgRNA_position, sgRNA_efficiency) %>%
+    distinct() %>%
+    group_by(sgRNA_position) %>%
+    summarize(sgRNA_efficiency = median(sgRNA_efficiency), n_pos = n()) %>%
+    filter(n_pos >= 10) %>%
+    ggplot(aes(x = sgRNA_position, y = sgRNA_efficiency)) +
+    labs(x = "barcode position (nt)", y = "repression efficiency") +
+    geom_point(col = alpha(custom_colors[5], 0.5)) +
+    geom_smooth(formula = "y ~ x", method = "loess") +
+    custom_theme()
 
 plot_sgRNA_efficiency
 plot_sgRNA_efficiency_hist
@@ -272,13 +272,13 @@ plot_sgRNA_efficiency_hist
 
 ```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE, eval = eval_chunks}
 DESeq_result_table %>%
-  filter(time == 0) %>%
-  group_by(condition, sgRNA) %>%
-  summarize(fitness = unique(fitness), .groups = "drop") %>%
-  ggplot(aes(x = fitness)) +
-  geom_histogram(bins = 100) +
-  facet_wrap(~condition) +
-  custom_theme()
+    filter(time == 0) %>%
+    group_by(condition, sgRNA) %>%
+    summarize(fitness = unique(fitness), .groups = "drop") %>%
+    ggplot(aes(x = fitness)) +
+    geom_histogram(bins = 100) +
+    facet_wrap(~condition) +
+    custom_theme()
 ```
 
 
@@ -290,13 +290,13 @@ DESeq_result_table %>%
 
 ```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE, eval = eval_chunks}
 DESeq_result_table %>%
-  filter(time == 0) %>%
-  group_by(condition, sgRNA_target) %>%
-  summarize(wmean_fitness = unique(wmean_fitness), .groups = "drop") %>%
-  ggplot(aes(x = wmean_fitness)) +
-  geom_histogram(bins = 100) +
-  facet_wrap(~condition) +
-  custom_theme()
+    filter(time == 0) %>%
+    group_by(condition, sgRNA_target) %>%
+    summarize(wmean_fitness = unique(wmean_fitness), .groups = "drop") %>%
+    ggplot(aes(x = wmean_fitness)) +
+    geom_histogram(bins = 100) +
+    facet_wrap(~condition) +
+    custom_theme()
 ```
 
 - This plot shows the global distribution of effect size versus significance score
@@ -306,16 +306,16 @@ DESeq_result_table %>%
 
 ```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE, eval = eval_chunks}
 DESeq_result_table %>%
-  filter(time == 0) %>%
-  group_by(condition, sgRNA_target) %>%
-  summarize(
-    wmean_fitness = unique(wmean_fitness),
-    p_fitness_adj = unique(p_fitness_adj)
-    , .groups = "drop") %>%
-  ggplot(aes(x = wmean_fitness, y = -log10(p_fitness_adj))) +
-  geom_point() +
-  facet_wrap(~condition) +
-  custom_theme()
+    filter(time == 0) %>%
+    group_by(condition, sgRNA_target) %>%
+    summarize(
+        wmean_fitness = unique(wmean_fitness),
+        p_fitness_adj = unique(p_fitness_adj)
+        , .groups = "drop") %>%
+    ggplot(aes(x = wmean_fitness, y = -log10(p_fitness_adj))) +
+    geom_point() +
+    facet_wrap(~condition) +
+    custom_theme()
 ```
 
 # Report info
@@ -328,8 +328,8 @@ Author: Michael Jahn, PhD
 
 Affilations:
 
-  - Science For Life Laboratory (KTH), Stockholm, Sweden
-  - Max-Planck-Unit for the Science of Pathogens, Berlin, Germany
+- Science For Life Laboratory (KTH), Stockholm, Sweden
+- Max-Planck-Unit for the Science of Pathogens, Berlin, Germany
 
 # Session Info
 
