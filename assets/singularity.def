@@ -1,0 +1,56 @@
+Bootstrap: docker
+From: condaforge/mambaforge:latest
+
+%help
+    Description:
+    Recipe for singularity container that bundles a conda environment for fitness analysis as part
+    of the 'nf-core-crispriscreen' pipeline.
+    For more information, see https://github.com/MPUSP/nf-core-crispriscreen
+
+    To build this container, run:
+    'singularity build --fakeroot nf-core-crispriscreen-fitness.sif assets/singularity.def'
+
+    To execute this container with default command, run:
+    'singularity run nf-core-crispriscreen-fitness.sif'
+
+    To execute a custom command with this container, run:
+    'singularity exec nf-core-crispriscreen-fitness.sif /bin/bash -c "conda info"'
+
+    To drop into a shell for this container, run:
+    'singularity shell nf-core-crispriscreen-fitness.sif'
+
+    To print this help, run:
+    'singularity run-help nf-core-crispriscreen-fitness.sif'
+
+    Recipe is based on the example from
+    https://geniac.readthedocs.io/en/latest/conda.html
+
+%labels
+    org.opencontainers.image.source=https://github.com/MPUSP/nf-core-crispriscreen
+    org.opencontainers.image.description="nf-core-crispriscreen"
+
+%files
+    modules/local/fitness/environment.yml /conda-env/environment.yml
+
+%environment
+    export SINGULARITY_SHELL=/bin/bash
+    export BASH_ENV=/opt/etc/bashrc
+
+%post
+
+%post -c /bin/bash
+    mkdir -p /opt/etc && \
+    mkdir -p /conda-env/fitness && \
+    mamba env create --yes --prefix /conda-env/fitness --file /conda-env/environment.yml && \
+    echo -e "#! /bin/bash\n\n# script to activate the conda environment" > ~/.bashrc && \
+    conda init bash && \
+    echo -e "\nconda activate /conda-env/fitness" >> ~/.bashrc && \
+    echo "echo \"Activating conda environment\"" >>  ~/.bashrc && \
+    conda clean --all --yes && \
+    cp ~/.bashrc /opt/etc/bashrc
+
+%runscript
+    exec /bin/bash "$@"
+
+%startscript
+    exec /bin/bash "$@"

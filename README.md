@@ -1,13 +1,8 @@
 # ![nf-core/crispriscreen](docs/images/nf-core-crispriscreen_logo_light.png#gh-light-mode-only) ![nf-core/crispriscreen](docs/images/nf-core-crispriscreen_logo_dark.png#gh-dark-mode-only)
 
-<!--
-[![AWS CI](https://img.shields.io/badge/CI%20tests-full%20size-FF9900?labelColor=000000&logo=Amazon%20AWS)](https://nf-co.re/crispriscreen/results)
-[![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.XXXXXXX-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.XXXXXXX)
--->
-
 [![GitHub Actions CI Status](https://github.com/MPUSP/nf-core-crispriscreen/workflows/nf-core%20CI/badge.svg)](https://github.com/MPUSP/nf-core-crispriscreen/actions?query=workflow%3A%22nf-core+CI%22)
 [![GitHub Actions Linting Status](https://github.com/MPUSP/nf-core-crispriscreen/workflows/nf-core%20linting/badge.svg?branch=dev)](https://github.com/MPUSP/nf-core-crispriscreen/actions?query=workflow%3A%22nf-core+linting%22)
-[![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A522.10.1-23aa62.svg)](https://www.nextflow.io/)
+[![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A523.04.0-23aa62.svg)](https://www.nextflow.io/)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
 [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
 [![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)
@@ -20,10 +15,6 @@
 **nf-core/crispriscreen** is a bioinformatics best-practice analysis pipeline to process next generation sequencing data obtained from CRISPRi repression library screenings.
 
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It uses Docker/Singularity containers making installation trivial and results highly reproducible. The [Nextflow DSL2](https://www.nextflow.io/docs/latest/dsl2.html) implementation of this pipeline uses one container per process which makes it much easier to maintain and update software dependencies. Where possible, these processes have been submitted to and installed from [nf-core/modules](https://github.com/nf-core/modules) in order to make them available to all nf-core pipelines, and to everyone within the Nextflow community!
-
-<!-- TODO nf-core: Add full-sized test dataset and amend the paragraph below if applicable
-On release, automated continuous integration tests run the pipeline on a full-sized dataset on the AWS cloud infrastructure. This ensures that the pipeline runs on AWS, has sensible resource allocation defaults set to run on real-world datasets, and permits the persistent storage of results to benchmark between pipeline releases and other analysis sources. The results obtained from the full-sized test can be viewed on the [nf-core website](https://nf-co.re/crispriscreen/results).
- -->
 
 ## Pipeline summary
 
@@ -45,7 +36,7 @@ On release, automated continuous integration tests run the pipeline on a full-si
 
 ## Quick Start
 
-1. Install [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation) (`>=22.10.1`).
+1. Install [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation) (`>=23.04.0`).
    It is recommended to use [`Conda`](https://conda.io/miniconda.html) (or `mamba` / `micromamba`) to install all dependencies in a fresh environment.
 
    ```console
@@ -88,8 +79,6 @@ On release, automated continuous integration tests run the pipeline on a full-si
    > - If you are using `conda`, it is highly recommended to use the [`NXF_CONDA_CACHEDIR` or `conda.cacheDir`](https://www.nextflow.io/docs/latest/conda.html) settings to store the environments in a central location for future pipeline runs.
 
 ## Documentation
-
-<!-- TODO: Add links to main nf-core website if published, e.g. [usage](https://nf-co.re/crispriscreen/usage) -->
 
 The nf-core/crispriscreen pipeline comes with documentation about the pipeline [usage](https://MPUSP.github.io/nf-core-crispriscreen/usage) and [output](https://MPUSP.github.io/nf-core-crispriscreen/output).
 

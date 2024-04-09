@@ -49,7 +49,7 @@ df_combined$Gene <- substr(sgrna, 1, as.numeric(regexpr(gene_sep, sgrna) - 1))
 colnames(df_combined)[1] <- "sgRNA"
 df_combined <- df_combined[c(1, ncol(df_combined), 2:(ncol(df_combined) - 1))]
 colnames(df_combined)[3:ncol(df_combined)] <- gsub(
-    "\\_T[0-9]+\\.bam$", "",
+    "(\\_T[0-9]+)?\\.bam$", "",
     colnames(df_combined)[3:ncol(df_combined)]
 )
 

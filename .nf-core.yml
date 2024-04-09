@@ -1,1 +1,6 @@
 repository_type: pipeline
+lint:
+  actions_awsfulltest: False
+  actions_awstest: False
+  files_unchanged: False
+  system_exit: False

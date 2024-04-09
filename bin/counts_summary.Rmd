@@ -3,18 +3,18 @@ title: "Read counts summary"
 author: "SYSTEM: `r version[13]`"
 date: "DATE: `r Sys.time()`"
 params:
-  cpus: 2
-  artifact_dir: artifacts
-  input_dir: ./
-  meta: ""
+    cpus: 2
+    artifact_dir: artifacts
+    input_dir: ./
+    meta: ""
 output:
-  html_notebook:
-    theme: cosmo
-    toc: yes
-    number_sections: yes
-  html_document:
-    toc: yes
-    df_print: paged
+    html_notebook:
+        theme: cosmo
+        toc: yes
+        number_sections: yes
+    html_document:
+        toc: yes
+        df_print: paged
 ---
 
 ```{r setup, include = FALSE}
@@ -203,7 +203,7 @@ df_counts %>%
     labs(x = "") +
     coord_flip() +
     scale_fill_manual(values = colorRampPalette(custom_colors[1:5])(9)) +
-    custom_theme(legend.position = 0)
+    custom_theme(legend.position = "none")
 ```
 
 ## Read count distribution, per sample (capped at 1000 barcodes)
@@ -340,7 +340,7 @@ df_PCA %>%
         title = "PCA, first three principal components",
         subtitle = "Point size encodes PC3", x = "PC1", y = "PC2"
     ) +
-    custom_theme(legend.position = 0, aspect = 1) +
+    custom_theme(legend.position = "none", aspect.ratio = 1) +
     scale_color_manual(values = colorRampPalette(custom_colors)(nrow(df_PCA))) +
     guides(size = "none")
 ```
@@ -355,8 +355,8 @@ Author: Michael Jahn, PhD
 
 Affilations:
 
-  - Science For Life Laboratory (KTH), Stockholm, Sweden
-  - Max-Planck-Unit for the Science of Pathogens, Berlin, Germany
+- Science For Life Laboratory (KTH), Stockholm, Sweden
+- Max-Planck-Unit for the Science of Pathogens, Berlin, Germany
 
 # Session Info
 

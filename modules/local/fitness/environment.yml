@@ -1,0 +1,14 @@
+name: fitness
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - r-base=4.3.3
+  - r-tidyverse=2.0.0
+  - bioconductor-deseq2=1.42.0
+  - bioconductor-biocparallel=1.36.0
+  - bioconductor-limma=3.58.1
+  - r-hmisc=5.1-2
+  - r-rmarkdown=2.26
+  - r-yaml=2.3.8

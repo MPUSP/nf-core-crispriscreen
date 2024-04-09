@@ -27,50 +27,15 @@ number_cores <- as.numeric(args[7]) # number of CPU cores
 # LOAD PACKAGES
 # ====================
 #
-# add library dir for additional packages
-homedir <- system("echo ${HOME}", intern = TRUE)
-libdir <- .libPaths()
-if (any(grepl(homedir, libdir))) {
-    pkdir <- grep(homedir, libdir, value = TRUE)
-} else {
-    pkdir <- paste0(homedir, "/.R")
-    system(paste0("mkdir ", pkdir))
-    .libPaths(new = pkdir)
-}
-
-# generic R packages
-list_req_packages <- c("readr", "dplyr", "tibble", "stringr", "tidyr", "purrr")
-list_to_install <- setdiff(list_req_packages, rownames(installed.packages()))
-if (length(list_to_install)) {
-    message(paste0("Missing package(s) ", paste(list_to_install, collapse = ", "), " are installed to '", pkdir, "'."))
-    install.packages(pkgs = list_to_install, lib = pkdir, repos = "https://cloud.r-project.org")
-}
-
 library(readr)
 library(tibble)
 library(stringr)
 library(tidyr)
 library(dplyr)
 library(purrr)
-
-# Bioconductor packages
-list_bioc_packages <- c("DESeq2", "BiocParallel")
-if (normalization) {
-    list_bioc_packages <- c(list_bioc_packages, "limma")
-}
-
-list_to_install <- setdiff(list_bioc_packages, rownames(installed.packages()))
-if (length(list_to_install)) {
-    message(paste0("Missing package(s) ", paste(list_to_install, collapse = ", "), " are installed to '", pkdir, "'."))
-    install.packages(pkgs = "BiocManager", lib = pkdir, repos = "https://cloud.r-project.org")
-    BiocManager::install(
-        pkgs = list_to_install, lib = pkdir,
-        update = FALSE, ask = FALSE
-    )
-}
-
 library(DESeq2)
 library(BiocParallel)
+
 if (normalization) {
     library(limma)
 }
