@@ -3,6 +3,9 @@ process FITNESS {
     label 'process_high'
 
     conda "${moduleDir}/environment.yml"
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'oras://ghcr.io/MPUSP/nf-core-crispriscreen-fitness:1.0.0' :
+        'oras://ghcr.io/MPUSP/nf-core-crispriscreen-fitness:1.0.0' }"
 
     input:
     path samplesheet

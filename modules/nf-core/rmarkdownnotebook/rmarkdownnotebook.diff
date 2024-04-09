@@ -1,16 +1,21 @@
 Changes in module 'nf-core/rmarkdownnotebook'
 --- modules/nf-core/rmarkdownnotebook/main.nf
 +++ modules/nf-core/rmarkdownnotebook/main.nf
-@@ -8,9 +8,9 @@
-     //dependencies for your analysis. The container at least needs to contain the
-     //yaml and rmarkdown R packages.
+@@ -4,13 +4,12 @@
+     tag "$meta.id"
+     label 'process_low'
+ 
+-    //NB: You likely want to override this with a container containing all required
+-    //dependencies for your analysis. The container at least needs to contain the
+-    //yaml and rmarkdown R packages.
++    // Override of default container with one that has latest R, yaml, rmakrdown, and tidyverse packages.
++    // Fix changes by running "nf-core modules patch"
      conda "${moduleDir}/environment.yml"
--    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
 -        'https://depot.galaxyproject.org/singularity/mulled-v2-31ad840d814d356e5f98030a4ee308a16db64ec5:0e852a1e4063fdcbe3f254ac2c7469747a60e361-0' :
--        'quay.io/biocontainers/mulled-v2-31ad840d814d356e5f98030a4ee308a16db64ec5:0e852a1e4063fdcbe3f254ac2c7469747a60e361-0' }"
-+    //container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-+    //    'https://depot.galaxyproject.org/singularity/mulled-v2-31ad840d814d356e5f98030a4ee308a16db64ec5:0e852a1e4063fdcbe3f254ac2c7469747a60e361-0' :
-+    //    'quay.io/biocontainers/mulled-v2-31ad840d814d356e5f98030a4ee308a16db64ec5:0e852a1e4063fdcbe3f254ac2c7469747a60e361-0' }"
+-        'biocontainers/mulled-v2-31ad840d814d356e5f98030a4ee308a16db64ec5:0e852a1e4063fdcbe3f254ac2c7469747a60e361-0' }"
++        'oras://ghcr.io/MPUSP/nf-core-crispriscreen-fitness:1.0.0' :
++        'oras://ghcr.io/MPUSP/nf-core-crispriscreen-fitness:1.0.0' }"
  
      input:
      tuple val(meta), path(notebook)
