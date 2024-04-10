@@ -23,39 +23,14 @@ knitr::opts_chunk$set(echo = FALSE)
 
 # Requirements
 
-- if not all dependencies are satisfied by R environment, try to install additional libraries `dplyr`, `ggplot2`
-
-```{r}
-list_req_packages <- c("dplyr", "ggplot2", "gridExtra")
-list_to_install <- setdiff(list_req_packages, rownames(installed.packages()))
-
-if (length(list_to_install)) {
-    # add library dir for additional packages
-    homedir <- system("echo ${HOME}", intern = TRUE)
-    libdir <- .libPaths()
-    if (any(grepl(homedir, libdir))) {
-        pkdir <- grep(homedir, libdir, value = TRUE)
-    } else {
-        pkdir <- paste0(homedir, "/.R")
-        system(paste0("mkdir ", pkdir))
-        .libPaths(new = pkdir)
-    }
-    install.packages(pkgs = list_to_install, lib = pkdir)
-    print(paste0("Missing package(s) ", paste(list_to_install, collapse = ", "), " are installed to '", pkdir, "'."))
-} else {
-    print(paste0("Required package(s) ", paste(list_req_packages, collapse = ", "), " are already installed."))
-}
-```
-
-- loading libraries
+- loading libraries `dplyr`, `ggplot2`, `tidyr`
 
 ```{r}
 suppressPackageStartupMessages({
-    for (pkg in list_req_packages) {
-        library(pkg, character.only = TRUE)
-    }
+    library(dplyr)
+    library(ggplot2)
+    library(tidyr)
 })
-print(paste0("Required package(s) ", paste(list_req_packages, collapse = ", "), " are loaded."))
 ```
 
 # Sample overview
@@ -106,7 +81,7 @@ figwidth <- 9
 figheight <- round(2 + (length(list_conditions)))
 
 # output sample table
-DESeq_result_table %>%
+df_conditions <- DESeq_result_table %>%
     group_by(condition, time) %>%
     summarize(
         .groups = "drop",
@@ -114,6 +89,9 @@ DESeq_result_table %>%
         DESeq_baseMean = mean(baseMean, na.rm = TRUE),
         DESeq_log2FC = mean(log2FoldChange, na.rm = TRUE),
     )
+
+write.csv(df_conditions, file = "conditions_table.csv")
+df_conditions
 ```
 
 
@@ -145,6 +123,29 @@ custom_theme <- function(base_size = 12, base_line_size = 1.0, base_rect_size = 
         ...
     )
 }
+
+# function to export an image as svg and png
+save_plot <- function(pl, path = "", width = 6, height = 6) {
+    pl_name <- deparse(substitute(pl))
+    pdf(
+        file = paste0(path, pl_name, ".pdf"),
+        width = width, height = height
+    )
+    print(pl)
+    dev.off()
+    grDevices::svg(
+        filename = paste0(path, pl_name, ".svg"),
+        width = width, height = height
+    )
+    print(pl)
+    dev.off()
+    grDevices::png(
+        filename = paste0(path, pl_name, ".png"),
+        width = width * 125, height = height * 125, res = 120
+    )
+    print(pl)
+    invisible(capture.output(dev.off()))
+}
 ```
 
 
@@ -157,7 +158,7 @@ custom_theme <- function(base_size = 12, base_line_size = 1.0, base_rect_size = 
 - this representation can reveal if certain positions (i.e. distant from TSS) are biased
 
 ```{r, fig.width = figwidth, fig.height = 4.5, warning = FALSE, eval = eval_chunks}
-plot_sgRNA_correlation <- DESeq_result_table %>%
+plot_sgrna_correlation <- DESeq_result_table %>%
     select(sgRNA_target, sgRNA_index, sgRNA_correlation, condition, time) %>%
     distinct() %>%
     # filter indices that have lower frequency than 3%
@@ -184,7 +185,12 @@ plot_sgRNA_correlation <- DESeq_result_table %>%
     coord_cartesian(ylim = c(-0.15, 1.15)) +
     custom_theme()
 
-plot_sgRNA_correlation_hist <- DESeq_result_table %>%
+save_plot(plot_sgrna_correlation, width = figwidth, height = 4.5)
+print(plot_sgrna_correlation)
+```
+
+```{r, fig.width = figwidth, fig.height = 4.5, warning = FALSE, eval = eval_chunks}
+plot_sgrna_correlation_hist <- DESeq_result_table %>%
     select(sgRNA_target, sgRNA_index, sgRNA_correlation, condition, time) %>%
     # filter indices that have lower frequency than 3%
     group_by(sgRNA_index) %>%
@@ -203,8 +209,8 @@ plot_sgRNA_correlation_hist <- DESeq_result_table %>%
     labs(x = "median barcode correlation", y = "count") +
     custom_theme()
 
-plot_sgRNA_correlation
-plot_sgRNA_correlation_hist
+save_plot(plot_sgrna_correlation_hist, width = figwidth, height = 4.5)
+print(plot_sgrna_correlation_hist)
 ```
 
 ## Barcode efficiency
@@ -215,7 +221,7 @@ plot_sgRNA_correlation_hist
 - this representation can reveal if certain positions (i.e. distant from TSS) are less effective in causing a fitness effect
 
 ```{r, fig.width = figwidth, fig.height = 4.5, warning = FALSE, eval = eval_chunks}
-plot_sgRNA_efficiency <- DESeq_result_table %>%
+plot_sgrna_efficiency <- DESeq_result_table %>%
     # filter indices that have lower frequency than 3%
     group_by(sgRNA_index) %>%
     mutate(n_obs = n()) %>%
@@ -241,7 +247,12 @@ plot_sgRNA_efficiency <- DESeq_result_table %>%
     }, geom = "text", color = grey(0.5), size = 3) +
     custom_theme()
 
-plot_sgRNA_efficiency_hist <- DESeq_result_table %>%
+save_plot(plot_sgrna_efficiency, width = figwidth, height = 4.5)
+print(plot_sgrna_efficiency)
+```
+
+```{r, fig.width = figwidth, fig.height = 4.5, warning = FALSE, eval = eval_chunks}
+plot_sgrna_efficiency_hist <- DESeq_result_table %>%
     # filter indices that have lower frequency than 3%
     group_by(sgRNA_index) %>%
     mutate(n_obs = n()) %>%
@@ -258,8 +269,8 @@ plot_sgRNA_efficiency_hist <- DESeq_result_table %>%
     geom_smooth(formula = "y ~ x", method = "loess") +
     custom_theme()
 
-plot_sgRNA_efficiency
-plot_sgRNA_efficiency_hist
+save_plot(plot_sgrna_efficiency_hist, width = figwidth, height = 4.5)
+print(plot_sgrna_efficiency_hist)
 ```
 
 ## Barcode fitness
@@ -271,7 +282,7 @@ plot_sgRNA_efficiency_hist
 - This information is useful to show global differences between conditions, e.g. stronger vs weaker selection
 
 ```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE, eval = eval_chunks}
-DESeq_result_table %>%
+plot_barcode_fitness <- DESeq_result_table %>%
     filter(time == 0) %>%
     group_by(condition, sgRNA) %>%
     summarize(fitness = unique(fitness), .groups = "drop") %>%
@@ -279,6 +290,9 @@ DESeq_result_table %>%
     geom_histogram(bins = 100) +
     facet_wrap(~condition) +
     custom_theme()
+
+save_plot(plot_barcode_fitness, width = figwidth, height = figheight)
+print(plot_barcode_fitness)
 ```
 
 
@@ -289,7 +303,7 @@ DESeq_result_table %>%
 - This information is useful to show global differences between conditions, e.g. stronger vs weaker selection
 
 ```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE, eval = eval_chunks}
-DESeq_result_table %>%
+plot_gene_fitness <- DESeq_result_table %>%
     filter(time == 0) %>%
     group_by(condition, sgRNA_target) %>%
     summarize(wmean_fitness = unique(wmean_fitness), .groups = "drop") %>%
@@ -297,6 +311,9 @@ DESeq_result_table %>%
     geom_histogram(bins = 100) +
     facet_wrap(~condition) +
     custom_theme()
+
+save_plot(plot_gene_fitness, width = figwidth, height = figheight)
+print(plot_gene_fitness)
 ```
 
 - This plot shows the global distribution of effect size versus significance score
@@ -305,7 +322,7 @@ DESeq_result_table %>%
 - This plot is useful to judge how many genes are _significant_ enriched or depleted
 
 ```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE, eval = eval_chunks}
-DESeq_result_table %>%
+plot_fitness_vs_pval <- DESeq_result_table %>%
     filter(time == 0) %>%
     group_by(condition, sgRNA_target) %>%
     summarize(
@@ -316,6 +333,9 @@ DESeq_result_table %>%
     geom_point() +
     facet_wrap(~condition) +
     custom_theme()
+
+save_plot(plot_fitness_vs_pval, width = figwidth, height = figheight)
+print(plot_fitness_vs_pval)
 ```
 
 # Report info

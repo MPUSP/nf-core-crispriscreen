@@ -23,33 +23,16 @@ knitr::opts_chunk$set(echo = FALSE)
 
 # Requirements
 
-- if not all dependencies are satisfied by R environment, try to install additional libraries `dplyr`, `ggplot2`, `tidyr`, `Hmisc`
-- loading libraries
-
-```{r}
-list_req_packages <- c("dplyr", "ggplot2", "tidyr", "Hmisc")
-list_to_install <- setdiff(list_req_packages, rownames(installed.packages()))
-
-if (length(list_to_install)) {
-    pkdir <- paste0(system("echo ${HOME}", intern = TRUE), "/.R")
-    system(paste0("mkdir ", pkdir))
-    .libPaths(new = pkdir)
-    install.packages(pkgs = list_to_install, lib = pkdir)
-    print(paste0("Missing package(s) ", paste(list_to_install, collapse = ", "), " are installed to '", pkdir, "'."))
-} else {
-    print(paste0("Required package(s) ", paste(list_req_packages, collapse = ", "), " are already installed."))
-}
-```
-
-- loading libraries
+- loading libraries `dplyr`, `ggplot2`, `tidyr`, `Hmisc`
 
 ```{r}
 suppressPackageStartupMessages({
-    for (pkg in list_req_packages) {
-        library(pkg, character.only = TRUE)
-    }
+    library(grDevices)
+    library(dplyr)
+    library(ggplot2)
+    library(tidyr)
+    library(Hmisc)
 })
-print(paste0("Required package(s) ", paste(list_req_packages, collapse = ", "), " are loaded."))
 ```
 
 # Sample overview
@@ -145,12 +128,35 @@ custom_theme <- function(base_size = 12, base_line_size = 1.0, base_rect_size = 
         ...
     )
 }
+
+# function to export an image as svg and png
+save_plot <- function(pl, path = "", width = 6, height = 6) {
+    pl_name <- deparse(substitute(pl))
+    pdf(
+        file = paste0(path, pl_name, ".pdf"),
+        width = width, height = height
+    )
+    print(pl)
+    dev.off()
+    grDevices::svg(
+        filename = paste0(path, pl_name, ".svg"),
+        width = width, height = height
+    )
+    print(pl)
+    dev.off()
+    grDevices::png(
+        filename = paste0(path, pl_name, ".png"),
+        width = width * 125, height = height * 125, res = 120
+    )
+    print(pl)
+    invisible(capture.output(dev.off()))
+}
 ```
 
 ## Total number of mapped reads per sample
 
 ```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE}
-df_counts %>%
+plot_total_mapped_reads <- df_counts %>%
     dplyr::group_by(sample) %>%
     dplyr::summarize(n_reads = sum(n_reads)) %>%
     ggplot(aes(x = sample, y = n_reads)) +
@@ -158,12 +164,15 @@ df_counts %>%
     geom_col(fill = custom_colors[1], alpha = 0.7) +
     labs(x = "", y = "total number of mapped reads") +
     custom_theme()
+
+save_plot(plot_total_mapped_reads, width = figwidth, height = figheight)
+print(plot_total_mapped_reads)
 ```
 
 ## Number of individual barcodes per sample
 
 ```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE}
-df_counts %>%
+plot_individual_barcodes <- df_counts %>%
     dplyr::group_by(sample) %>%
     dplyr::summarize(`unique barcodes per sample` = sum(n_reads > 0)) %>%
     ggplot(aes(x = sample, y = `unique barcodes per sample`)) +
@@ -171,12 +180,15 @@ df_counts %>%
     labs(x = "") +
     coord_flip() +
     custom_theme()
+
+save_plot(plot_individual_barcodes, width = figwidth, height = figheight)
+print(plot_individual_barcodes)
 ```
 
 ## Number of missing barcodes per sample
 
 ```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE}
-df_counts %>%
+plot_missing_barcodes <- df_counts %>%
     dplyr::group_by(sample) %>%
     dplyr::summarize(`missing barcodes per sample` = sum(n_reads == 0)) %>%
     ggplot(aes(x = sample, y = `missing barcodes per sample`)) +
@@ -184,12 +196,15 @@ df_counts %>%
     labs(x = "") +
     coord_flip() +
     custom_theme()
+
+save_plot(plot_missing_barcodes, width = figwidth, height = figheight)
+print(plot_missing_barcodes)
 ```
 
 ## Number of barcodes per gene, per sample
 
 ```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE}
-df_counts %>%
+plot_barcodes_gene_sample <- df_counts %>%
     dplyr::group_by(sample, Gene) %>%
     dplyr::summarize(`unique barcodes` = length(unique(sgRNA))) %>%
     dplyr::count(`unique barcodes`) %>%
@@ -204,12 +219,15 @@ df_counts %>%
     coord_flip() +
     scale_fill_manual(values = colorRampPalette(custom_colors[1:5])(9)) +
     custom_theme(legend.position = "none")
+
+save_plot(plot_barcodes_gene_sample, width = figwidth, height = figheight)
+print(plot_barcodes_gene_sample)
 ```
 
 ## Read count distribution, per sample (capped at 1000 barcodes)
 
 ```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE}
-df_counts %>%
+plot_count_dist <- df_counts %>%
     dplyr::group_by(sample) %>%
     dplyr::slice(1:1000) %>%
     ggplot(aes(x = sample, y = log10(n_reads))) +
@@ -220,23 +238,29 @@ df_counts %>%
     coord_flip() +
     stat_summary(fun.data = mean_sdl, geom = "pointrange", size = 0.5, col = grey(0.3)) +
     custom_theme()
+
+save_plot(plot_count_dist, width = figwidth, height = figheight)
+print(plot_count_dist)
 ```
 
 ## Number of reads per barcode, per sample
 
 ```{r, fig.width = figwidth, fig.height = figheight2, warning = FALSE}
-df_counts %>%
+plot_reads_per_bc <- df_counts %>%
     ggplot(aes(x = log2(n_reads))) +
     geom_histogram(fill = custom_colors[1], alpha = 0.7, bins = 30) +
     labs(y = "", x = expression("log"[2] * " reads per barcode")) +
     facet_wrap(~sample, ncol = 2) +
     custom_theme()
+
+save_plot(plot_reads_per_bc, width = figwidth, height = figheight2)
+print(plot_reads_per_bc)
 ```
 
 ## Top 10 most abundant barcodes, per sample
 
 ```{r, fig.width = figwidth, fig.height = figheight2, warning = FALSE}
-df_counts %>%
+plot_top10_barcodes <- df_counts %>%
     dplyr::group_by(sample) %>%
     dplyr::arrange(sample, desc(n_reads)) %>%
     dplyr::mutate(rank = seq_along(sgRNA)) %>%
@@ -246,9 +270,12 @@ df_counts %>%
     labs(y = "n reads", x = "barcodes ranked by abundance") +
     facet_wrap(~sample, ncol = 2) +
     custom_theme()
+
+save_plot(plot_top10_barcodes, width = figwidth, height = figheight2)
+print(plot_top10_barcodes)
 ```
 
-## Cumulative read count distribution and population equality
+## Cumulative read count distribution and barcode diversity
 
 ```{r, fig.width = figwidth, fig.height = figheight2, warning = FALSE}
 df_auc <- df_counts %>%
@@ -263,7 +290,7 @@ df_auc <- df_counts %>%
     dplyr::summarize(pc_reads = sum(pc_reads), .groups = "drop_last") %>%
     dplyr::mutate(pc_reads = cumsum(pc_reads))
 
-df_auc %>%
+plot_cumulative_read_count <- df_auc %>%
     ggplot(aes(x = pc_barcodes, y = pc_reads, group = sample)) +
     geom_line(linewidth = 1.0, color = custom_colors[1]) +
     geom_abline(
@@ -274,6 +301,9 @@ df_auc %>%
     lims(x = c(0, 100), y = c(0, 100)) +
     labs(x = "% of barcodes", y = "% of reads") +
     custom_theme()
+
+save_plot(plot_cumulative_read_count, width = figwidth, height = figheight2)
+print(plot_cumulative_read_count)
 ```
 
 ```{r, warning = FALSE}
@@ -286,9 +316,9 @@ df_auc %>%
         gini = (auc - 5000) / 5000
     ) %>%
     mutate(quality = case_when(
-        gini <= 0.2 ~ "OK",
-        gini > 0.2 & gini <= 0.5 ~ "warning: inequal read distribution",
-        gini > 0.5 ~ "warning: extremely inequal read distribution"
+        gini <= 0.25 ~ "OK",
+        gini > 0.25 & gini <= 0.5 ~ "inequal read distribution",
+        gini > 0.5 ~ "extremely inequal read distribution"
     ))
 ```
 
@@ -296,10 +326,12 @@ df_auc %>%
 ## Sample and replicate correlation coefficent (R)
 
 ```{r, fig.width = 7.5, fig.height = 7, warning = FALSE}
-df_counts %>%
+df_correlation <- df_counts %>%
     tidyr::pivot_wider(names_from = "sample", values_from = "n_reads") %>%
     dplyr::select(-c(1:2)) %>%
-    cor() %>%
+    cor()
+
+plot_replicate_correlation <- df_correlation %>%
     dplyr::as_tibble() %>%
     dplyr::mutate(sample1 = colnames(.)) %>%
     tidyr::pivot_longer(
@@ -316,6 +348,10 @@ df_counts %>%
         colours = c(custom_colors[1], grey(0.9), custom_colors[2]),
         limits = c(-1, 1)
     )
+
+write.csv(df_correlation, file = "correlation_table.csv")
+save_plot(plot_replicate_correlation, width = 7.5, height = 7)
+print(plot_replicate_correlation)
 ```
 
 ## Sample and replicate similarity with PCA
@@ -332,7 +368,7 @@ pca_result <- df_counts %>%
 df_PCA <- pca_result$x %>%
     as_tibble(rownames = "sample")
 
-df_PCA %>%
+plot_replicate_pca <- df_PCA %>%
     ggplot(aes(x = PC1, y = -PC2, size = PC3, color = sample, label = sample)) +
     geom_point(alpha = 0.7) +
     geom_text(size = 2.5, show.legend = FALSE) +
@@ -343,6 +379,9 @@ df_PCA %>%
     custom_theme(legend.position = "none", aspect.ratio = 1) +
     scale_color_manual(values = colorRampPalette(custom_colors)(nrow(df_PCA))) +
     guides(size = "none")
+
+save_plot(plot_replicate_pca, width = 7, height = 7)
+print(plot_replicate_pca)
 ```
 
 # Report info
