@@ -47,6 +47,7 @@ input_pattern <- "result.Rdata"
 # check input files and compile small table
 input_files <- grep(list.files(wd), pattern = input_pattern, value = TRUE)
 if (length(input_files) == 1) {
+    eval_chunks <- TRUE
     df_input <- bind_cols(
         data.frame(input_files),
         file.info(paste(wd, input_files, sep = "/"))
@@ -54,7 +55,6 @@ if (length(input_files) == 1) {
         mutate(size = paste(size / 1e6, "MB"))
     rownames(df_input) <- NULL
     df_input[c(1, 2, 3, 4, 5, 10)]
-    eval_chunks <- TRUE
 } else {
     print(paste0("Required input file(s) '", input_pattern, "' were not found."))
     print("Further processing of the analysis is omitted.")
@@ -78,7 +78,7 @@ print("Import of fitness table complete.")
 # list of samples + generic options
 list_conditions <- unique(DESeq_result_table$condition)
 figwidth <- 9
-figheight <- round(2 + (length(list_conditions)))
+figheight <- round(3.5 + (length(list_conditions)))
 
 # output sample table
 df_conditions <- DESeq_result_table %>%
@@ -216,13 +216,13 @@ print(plot_sgrna_correlation_hist)
 ## Barcode efficiency
 
 - Plots show the _efficiency_ for each barcode in relation to other barcodes for the same gene
-- efficiency here means the ability to of a mutant to cause an effect
+- efficiency here means the ability of a mutant to cause an effect
 - correlation is broken down by position/index of the barcode
 - this representation can reveal if certain positions (i.e. distant from TSS) are less effective in causing a fitness effect
+- indices/positions with less than 3% of all barcodes are removed
 
 ```{r, fig.width = figwidth, fig.height = 4.5, warning = FALSE, eval = eval_chunks}
 plot_sgrna_efficiency <- DESeq_result_table %>%
-    # filter indices that have lower frequency than 3%
     group_by(sgRNA_index) %>%
     mutate(n_obs = n()) %>%
     ungroup() %>%
@@ -253,7 +253,6 @@ print(plot_sgrna_efficiency)
 
 ```{r, fig.width = figwidth, fig.height = 4.5, warning = FALSE, eval = eval_chunks}
 plot_sgrna_efficiency_hist <- DESeq_result_table %>%
-    # filter indices that have lower frequency than 3%
     group_by(sgRNA_index) %>%
     mutate(n_obs = n()) %>%
     ungroup() %>%
@@ -319,7 +318,7 @@ print(plot_gene_fitness)
 - This plot shows the global distribution of effect size versus significance score
 - Effect size is the weighted mean fitness of all barcodes
 - Significance is the adjusted p-value from 2-sided Wilcoxon rank sum test
-- This plot is useful to judge how many genes are _significant_ enriched or depleted
+- This plot is useful to judge how many genes are _significantly_ enriched or depleted
 
 ```{r, fig.width = figwidth, fig.height = figheight, warning = FALSE, eval = eval_chunks}
 plot_fitness_vs_pval <- DESeq_result_table %>%
