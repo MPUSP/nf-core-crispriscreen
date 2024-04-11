@@ -11,6 +11,7 @@ Major update to modules, added singularity container, fixed plotting issues.
 
 - major update of all nf-core modules
 - singularity container for fitness module and rmarkdown noteboooks
+- export of figures to dedicated output folder, improved report
 
 ### `Fixed`
 

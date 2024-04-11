@@ -22,6 +22,10 @@ process RMARKDOWNNOTEBOOK {
     tuple val(meta), path ("artifacts/*")        , emit: artifacts, optional: true
     tuple val(meta), path ("session_info.log")   , emit: session_info
     path  "versions.yml"                         , emit: versions
+    path  "*.png"                                , emit: png, optional: true
+    path  "*.svg"                                , emit: svg, optional: true
+    path  "*.pdf"                                , emit: pdf, optional: true
+    path  "*_table.csv"                          , emit: csv, optional: true
 
     when:
     task.ext.when == null || task.ext.when

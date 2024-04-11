@@ -192,6 +192,8 @@ A custom R script employing [DESeq2](https://bioconductor.org/packages/release/b
 - `fitness_report/`
   - `counts_summary.nb.html`: HTML report with information about all samples and read counts.
   - `fitness_summary.nb.html`: HTML report with information about fitness scores for all conditions.
+  - `svg/png/pdf/`: sub folders with exported figures in SVG, PNG and PDF format
+  - `csv`: sub folder with additional tables created duing the reporting stage
 
 </details>
 
