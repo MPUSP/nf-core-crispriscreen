@@ -2,7 +2,7 @@
 
 [![GitHub Actions CI Status](https://github.com/MPUSP/nf-core-crispriscreen/workflows/nf-core%20CI/badge.svg)](https://github.com/MPUSP/nf-core-crispriscreen/actions?query=workflow%3A%22nf-core+CI%22)
 [![GitHub Actions Linting Status](https://github.com/MPUSP/nf-core-crispriscreen/workflows/nf-core%20linting/badge.svg?branch=dev)](https://github.com/MPUSP/nf-core-crispriscreen/actions?query=workflow%3A%22nf-core+linting%22)
-[![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A523.04.0-23aa62.svg)](https://www.nextflow.io/)
+[![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A524.04.2-23aa62.svg)](https://www.nextflow.io/)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
 [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
 [![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)
@@ -60,17 +60,17 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 4. Test it on the minimal dataset included with this repository. Since `nf-core-crispriscreen` is not a canonical `nf-core` pipeline (yet), it is necessary to indicate the path to the pipeline folder after the `run` statement.
 
-   The generalized command to run the pipeline:
+   This is the generalized command to run the pipeline:
 
    ```console
    nextflow run <path/to/nf-core-crispriscreen> -profile <docker/singularity/podman/shifter/charliecloud/conda/institute> --input <sample_sheet> --fasta <fasta_file> --outdir <path/to/output>
    ```
 
-   The command to run the pipeline on the enclosed test data using `Singularity` (recommended):
+   This will run the pipeline on the enclosed test data using `Singularity` (recommended):
 
    ```console
    cd path/to/nf-core-crispriscreen
-   nextflow run ./ -profile singularity --input "assets/samplesheet.csv" --fasta "assets/library.fasta" --outdir "results"
+   nextflow run ./ -profile test,singularity --outdir ./results
    ```
 
    > - The pipeline comes with config profiles called `docker`, `singularity`, `podman`, `shifter`, `charliecloud` and `conda` which instruct the pipeline to use the named tool for software management. For example, `-profile test,docker`.

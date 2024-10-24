@@ -1,4 +1,8 @@
 Changes in module 'nf-core/rmarkdownnotebook'
+'modules/nf-core/rmarkdownnotebook/meta.yml' is unchanged
+'modules/nf-core/rmarkdownnotebook/environment.yml' is unchanged
+'modules/nf-core/rmarkdownnotebook/parametrize.nf' is unchanged
+Changes in 'rmarkdownnotebook/main.nf':
 --- modules/nf-core/rmarkdownnotebook/main.nf
 +++ modules/nf-core/rmarkdownnotebook/main.nf
 @@ -4,13 +4,12 @@

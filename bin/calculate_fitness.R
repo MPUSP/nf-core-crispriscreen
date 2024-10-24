@@ -291,11 +291,18 @@ if (nrow(df_samplesheet) == 0) {
                 ungroup() %>%
                 filter(str_detect(sgRNA_target, gene_controls))
         }
-        get_controls <- function(condition) {
+        get_controls <- function(condition, time) {
             if (gene_controls != "") {
-                filter(df_controls, condition == condition)$fitness
+                condition <- unique(condition)
+                time <- unique(time)
+                vals <- dplyr::filter(
+                    df_controls,
+                    {{ condition }} == condition,
+                    {{ time }} == time
+                )$fitness
+                return(vals)
             } else {
-                NULL
+                return(NULL)
             }
         }
 
@@ -315,7 +322,7 @@ if (nrow(df_samplesheet) == 0) {
                     # user-supplied set of controls
                     p_fitness = stats::wilcox.test(
                         x = fitness,
-                        y = get_controls(condition),
+                        y = get_controls(condition, time),
                         alternative = "two.sided"
                     )$p.value
                 ),
