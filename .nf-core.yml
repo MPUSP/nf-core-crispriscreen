@@ -1,6 +1,22 @@
-repository_type: pipeline
+bump_version: null
 lint:
-  actions_awsfulltest: False
-  actions_awstest: False
-  files_unchanged: False
-  system_exit: False
+  actions_awsfulltest: false
+  actions_awstest: false
+  files_unchanged: false
+  system_exit: false
+  template_strings: false
+nf_core_version: 3.0.2
+org_path: null
+repository_type: pipeline
+template:
+  author: Michael Jahn
+  description: Pipeline to process next generation sequencing data obtained from CRISPRi
+    repression library screenings.
+  force: false
+  is_nfcore: false
+  name: crispriscreen
+  org: nf-core
+  outdir: .
+  skip_features: null
+  version: 1.0dev
+update: null

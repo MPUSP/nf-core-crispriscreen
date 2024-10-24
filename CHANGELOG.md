@@ -3,6 +3,14 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.2.0 - 2024-10-24
+
+Regular update to all modules, nextflow and nf-core versions.
+
+### `Fixed`
+
+- merged updated TEMPLATE branch into main
+
 ## v1.1.0 - 2024-04-09
 
 Major update to modules, added singularity container, fixed plotting issues.

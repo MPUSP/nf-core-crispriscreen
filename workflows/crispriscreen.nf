@@ -45,7 +45,7 @@ include { BOWTIE2_ALIGN          } from '../modules/nf-core/bowtie2/align/main'
 include { SUBREAD_FEATURECOUNTS  } from '../modules/nf-core/subread/featurecounts/main'
 include { MAGECK_MLE             } from '../modules/nf-core/mageck/mle/main'
 include { RMARKDOWNNOTEBOOK      } from '../modules/nf-core/rmarkdownnotebook/main'
-include { paramsSummaryMap       } from 'plugin/nf-validation'
+include { paramsSummaryMap       } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc   } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_crispriscreen_pipeline'
@@ -257,11 +257,12 @@ workflow CRISPRISCREEN {
         ch_multiqc_files.collect(),
         ch_multiqc_config.toList(),
         ch_multiqc_custom_config.toList(),
-        ch_multiqc_logo.toList()
+        ch_multiqc_logo.toList(),
+        [],
+        []
     )
 
-    emit:
-    multiqc_report = MULTIQC.out.report.toList() // channel: /path/to/multiqc_report.html
+    emit:multiqc_report = MULTIQC.out.report.toList() // channel: /path/to/multiqc_report.html
     versions       = ch_versions                 // channel: [ path(versions.yml) ]
 }
 
