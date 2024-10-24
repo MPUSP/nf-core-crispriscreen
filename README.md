@@ -60,17 +60,17 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 4. Test it on the minimal dataset included with this repository. Since `nf-core-crispriscreen` is not a canonical `nf-core` pipeline (yet), it is necessary to indicate the path to the pipeline folder after the `run` statement.
 
-   The generalized command to run the pipeline:
+   This is the generalized command to run the pipeline:
 
    ```console
    nextflow run <path/to/nf-core-crispriscreen> -profile <docker/singularity/podman/shifter/charliecloud/conda/institute> --input <sample_sheet> --fasta <fasta_file> --outdir <path/to/output>
    ```
 
-   The command to run the pipeline on the enclosed test data using `Singularity` (recommended):
+   This will run the pipeline on the enclosed test data using `Singularity` (recommended):
 
    ```console
    cd path/to/nf-core-crispriscreen
-   nextflow run ./ -profile singularity --input "assets/samplesheet.csv" --fasta "assets/library.fasta" --outdir "results"
+   nextflow run ./ -profile test,singularity --outdir ./results
    ```
 
    > - The pipeline comes with config profiles called `docker`, `singularity`, `podman`, `shifter`, `charliecloud` and `conda` which instruct the pipeline to use the named tool for software management. For example, `-profile test,docker`.
