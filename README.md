@@ -1,7 +1,7 @@
 # ![nf-core/crispriscreen](docs/images/nf-core-crispriscreen_logo_light.png#gh-light-mode-only) ![nf-core/crispriscreen](docs/images/nf-core-crispriscreen_logo_dark.png#gh-dark-mode-only)
 
 [![GitHub Actions CI Status](https://github.com/MPUSP/nf-core-crispriscreen/workflows/nf-core%20CI/badge.svg)](https://github.com/MPUSP/nf-core-crispriscreen/actions?query=workflow%3A%22nf-core+CI%22)
-[![GitHub Actions Linting Status](https://github.com/MPUSP/nf-core-crispriscreen/workflows/nf-core%20linting/badge.svg?branch=dev)](https://github.com/MPUSP/nf-core-crispriscreen/actions?query=workflow%3A%22nf-core+linting%22)
+[![GitHub Actions Linting Status](https://github.com/MPUSP/nf-core-crispriscreen/actions/workflows/linting.yml/badge.svg?branch=dev)](https://github.com/MPUSP/nf-core-crispriscreen/actions/workflows/linting.yml)
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A524.04.2-23aa62.svg)](https://www.nextflow.io/)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
 [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
@@ -37,7 +37,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 ## Quick Start
 
 1. Install [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation) (`>=23.04.0`).
-   It is recommended to use [`Conda`](https://conda.io/miniconda.html) (or `mamba` / `micromamba`) to install all dependencies in a fresh environment.
+   It is recommended to use [`conda`](https://conda.io/miniconda.html) (or `mamba` / `micromamba`) to install all dependencies in a fresh environment.
 
    ```console
    conda create --name env_nf
@@ -58,7 +58,23 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
    git clone https://github.com/MPUSP/nf-core-crispriscreen
    ```
 
-4. Test it on the minimal dataset included with this repository. Since `nf-core-crispriscreen` is not a canonical `nf-core` pipeline (yet), it is necessary to indicate the path to the pipeline folder after the `run` statement.
+4. Configure your [computational resources](https://nf-co.re/docs/usage/getting_started/configuration). The pipeline comes with a set of basic resource definitions stored in `conf/base.config`. Maximum resources in terms of memory, CPU cores, and time can be defined for each process flag separately, for example:
+
+   ```console
+   withLabel:process_low {
+       cpus   = { 2     * task.attempt }
+       memory = { 12.GB * task.attempt }
+       time   = { 4.h   * task.attempt }
+   }
+   ```
+
+   In order to use custom resource configurations, create a new file `custom.config` and execute the pipeline with the `-c` flag.
+
+   ```console
+   nextflow run <path/to/nf-core-crispriscreen> -c custom.config <all/other/options>
+   ```
+
+5. Test it on the minimal dataset included with this repository. Since `nf-core-crispriscreen` is not a canonical `nf-core` pipeline (yet), it is necessary to indicate the path to the pipeline folder after the `run` statement.
 
    This is the generalized command to run the pipeline:
 

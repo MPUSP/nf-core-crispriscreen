@@ -2,6 +2,8 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - conda-forge::r-base=4.1.0
-  - conda-forge::r-rmarkdown=2.9
-  - conda-forge::r-yaml=2.2.1
+  - r-base=4.3.3
+  - r-tidyverse=2.0.0
+  - r-hmisc=5.1-2
+  - r-rmarkdown=2.26
+  - r-yaml=2.3.8

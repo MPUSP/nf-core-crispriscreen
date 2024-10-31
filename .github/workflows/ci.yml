@@ -30,7 +30,6 @@ jobs:
           - "24.04.2"
         profile:
           - "conda"
-          - "singularity"
         test_name:
           - "test"
         isMaster:
